@@ -1,4 +1,4 @@
-const apiKey = 'd766098dd42c4caebdf0fa7e344a2743';
+const apiKey = 'USE YOUR OWN API KEY';
 
 document.addEventListener('DOMContentLoaded', async () => {
 
@@ -90,12 +90,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // preload network images
+    // preload images
     Object.values(network.getList()).forEach(e => {
         e.icon = document.createElement('img');
         e.icon.src = `https://owlracle.info/img/${e.symbol}.png`;
     });
-
+    const imgCache = Object.fromEntries([
+        ...['candle-chart', 'line-chart'].map(e => {
+            const img = document.createElement('img');
+            img.src = `https://owlracle.info/img/${e}.png`;
+            return [e, img];
+        }),
+        ...['time-10','time-30','time-60','time-120','time-240','time-1440'].map(e => {
+            const img = document.createElement('img');
+            img.src = `img/${e}.png`;
+            return [e, img];
+        })
+    ]);
 
 
     // dropdown class
@@ -161,7 +172,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>`;
             document.body.appendChild(fog);
             fog.addEventListener('click', () => fog.remove());
-            fog.querySelector('.modal').addEventListener('click', e => e.preventDefault());
+            fog.querySelector('.modal').addEventListener('click', e => e.stopPropagation());
             fog.querySelector('#ok').addEventListener('click', () => fog.remove());
 
             return this;
@@ -193,8 +204,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </div>`;
                 container.insertAdjacentHTML('beforeend', dom);
             });
-
-            container.classList.add('active');
         },
     
         update: async function() {
@@ -257,6 +266,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 this.bound = true;
                 this.bindClick();
                 gasTimer.init();
+                chart.init();
             }
 
             document.querySelector('#header #link').href = `https://owlracle.info/${network.get().symbol}`;
@@ -270,7 +280,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 gasTimer.update();
             }
             if (menu.getActive() == 'chart'){
-                chart.timeframeSwitch(60, '1h');
+                chart.timeframeSwitch();
             }
         },
 
@@ -292,44 +302,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
 
-    const menu = {
-        // set function for switching between menu buttons
-        init: function() {
-            document.querySelectorAll('#menu .item').forEach(e => e.addEventListener('click', () => this.setActive(e.id)));
-        },
-
-        // change dom css
-        setActive: function(active) {
-            this.active = active;
-
-            document.querySelectorAll('#menu .item, #content .item').forEach(e => {
-                e.classList.remove('active');
-            });
-    
-            document.querySelector(`#content #${active}.item`).classList.add('active');
-            document.querySelector(`#menu #${active}.item`).classList.add('active');
-        },
-
-        getActive: function() {
-            return this.active;
-        },
-
-        setClick: function(active, fn) {
-            document.querySelector(`#menu #${active}.item`).addEventListener('click', () => fn());
-        },
-
-        click: function(active) {
-            document.querySelector(`#menu #${active}.item`).click();
-        },
-    }
-    menu.init();
-
-    // function for gas menu button
-    menu.setClick('gas', () => networkSwitcher.reload());
-    menu.setClick('chart', () => networkSwitcher.reload());
-    menu.click('gas');
-
-
     // create price chart
     const chart = {
         ready: false,
@@ -339,7 +311,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         lastCandle: (new Date().getTime() / 1000).toFixed(0),
         allRead: false,
         network: network.get().symbol,
-        mode: 'gas',
         config: {
             area: {
                 style: 'area',
@@ -357,10 +328,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.querySelector('#content #chart.item').innerHTML = `
                 <div class="row">
                     <div id="timeframe-switcher"><button></button></div>
-                    <div id="style-switcher">
-                        <button id="style-area" title="Change to Area Chart Style"><img src="https://owlracle.info/img/line-chart.png" alt="line chart symbol"></button>
-                        <button id="style-candlestick" title="Change to Candlestick Chart Style"><img src="https://owlracle.info/img/candle-chart.png" alt="candlestick chart symbol"></button>
-                    </div>
+                    <div id="style-switcher"><button><img></button></div>
                 </div>
                 <div id="chart"><i class="fas fa-spin fa-cog"></i></div>
                 <div id="toggle-container">
@@ -372,7 +340,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             this.obj = LightweightCharts.createChart(document.querySelector('#content #chart.item #chart'), {
                 width: document.querySelector('#content').offsetWidth,
-                height: 300,
+                height: 350,
                 crosshair: {
                     mode: LightweightCharts.CrosshairMode.Normal,
                 },
@@ -382,6 +350,32 @@ document.addEventListener('DOMContentLoaded', async () => {
                 },
             });
 
+            // load chart preferences cookie
+            if (cookies.get('chart')){
+                let chartCookie = null;
+                try {
+                    chartCookie = JSON.parse(cookies.get('chart'));
+                }
+                catch (error){
+                    console.log(error);
+                    cookies.delete('chart');
+                }
+
+                // test each individually to unsure loading only valid values
+                if (chartCookie.gas){
+                    this.preferences.gas = chartCookie.gas;
+                }
+                if (chartCookie.token){
+                    this.preferences.token = chartCookie.token;
+                }
+                if (chartCookie.fee){
+                    this.preferences.fee = chartCookie.fee;
+                }
+                if (chartCookie.timeframe){
+                    this.timeframe = chartCookie.timeframe;
+                }
+            }
+
             // copy object
             this.series = {
                 gas: { config: Object.assign({}, this.config[this.preferences.gas]) },
@@ -390,33 +384,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             };
             
             // set modality buttons behaviour
-            document.querySelectorAll(`#content #chart.item #toggle-container button`).forEach(e => e.addEventListener('click', async () => {
-                if (e.classList.contains('active')){
-                    return;
-                }
-
-                document.querySelectorAll(`#content #chart.item #toggle-container button`).forEach(a => {
-                    const series = this.series[a.id];
-                    if (a == e) {
-                        a.classList.add('active');
-                        series.visible = true;
-                        this.mode = a.id;
-
-                        // set candlestick or area button
-                        document.querySelectorAll('#content #chart.item #style-switcher button').forEach(e => e.classList.remove('active'));
-                        document.querySelector(`#content #chart.item #style-${series.config.style}`).classList.add('active');
-
-                    }
-                    else {
-                        a.classList.remove('active');
-                        series.visible = false;
-                    }
-
-                    if (series.series) {
-                        series.series.applyOptions({ visible: series.visible });
-                    }
-                });
-            }));
+            document.querySelectorAll(`#content #chart.item #toggle-container button`).forEach(e => e.addEventListener('click', () => this.setMode(e.id)));
+            this.setMode('gas');
 
             const container = document.querySelector('#chart.item #chart');
             const toolTip = document.createElement('div');
@@ -463,14 +432,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             new Dropdown({
                 button: document.querySelector('#content #chart.item #timeframe-switcher button'),
                 itemList: [
-                    { id: 'tf-10', innerHTML: '10 minutes' },
-                    { id: 'tf-30', innerHTML: '30 minutes' },
-                    { id: 'tf-60', innerHTML: '1 hour' },
-                    { id: 'tf-120', innerHTML: '2 hours' },
-                    { id: 'tf-240', innerHTML: '4 hours' },
-                    { id: 'tf-1440', innerHTML: '1 day' },
+                    { id: 'tf-10', innerHTML: `<img class="icon" src="${imgCache['time-10'].src}">10 minutes` },
+                    { id: 'tf-30', innerHTML: `<img class="icon" src="${imgCache['time-30'].src}">30 minutes` },
+                    { id: 'tf-60', innerHTML: `<img class="icon" src="${imgCache['time-60'].src}">1 hour` },
+                    { id: 'tf-120', innerHTML: `<img class="icon" src="${imgCache['time-120'].src}">2 hours` },
+                    { id: 'tf-240', innerHTML: `<img class="icon" src="${imgCache['time-240'].src}">4 hours` },
+                    { id: 'tf-1440', innerHTML: `<img class="icon" src="${imgCache['time-1440'].src}">1 day` },
                 ],
-                clickFn: b => chart.timeframeSwitch(b.id.split('tf-')[1], b.innerHTML.split(' ')[0] + b.innerHTML.split(' ')[1][0]),
+                clickFn: b => chart.timeframeSwitch(b.id.split('tf-')[1]),
             });
 
             this.timeScale = this.obj.timeScale();
@@ -496,48 +465,106 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
             // set candle/area style buttons behaviour
-            // document.querySelectorAll('#content #chart.item #style-switcher button').forEach(e => e.addEventListener('click', async () => {
-            //     if (e.classList.contains('active')){
-            //         return;
-            //     }
+            new Dropdown({
+                button: document.querySelector('#content #chart.item #style-switcher button'),
+                itemList: [
+                    { id: 'style-area', innerHTML: `<img class="icon" src="${imgCache['line-chart'].src}">Area` },
+                    { id: 'style-candlestick', innerHTML: `<img class="icon" src="${imgCache['candle-chart'].src}">Candlestick` },
+                ],
+                clickFn: async b => {
+                    if (this.queryHistory){
+                        return;
+                    }
 
-            //     e.parentNode.querySelectorAll('button').forEach(e => e.classList.toggle('active'));
-            //     const text = e.innerHTML;
-            //     e.innerHTML = `<i class="fas fa-spin fa-cog"></i>`;
+                    const styleswitcher = document.querySelector('#content #chart.item #style-switcher button');
+                    styleswitcher.innerHTML = `<i class="fas fa-spin fa-cog"></i>`;
+                    const serie = this.series[this.mode];
+                    const style = this.preferences[this.mode] = b.id.split('style-')[1];
+                    serie.config = Object.assign({}, this.config[style]);
+    
+                    this.queryHistory = true;
+                    const history = await this.getHistory(this.timeframe);
+    
+                    this.obj.removeSeries(serie.series);
+                    serie.series = null;
+    
+                    this.update(history);
+    
+                    serie.series.applyOptions({ visible: serie.visible });
+    
+                    styleswitcher.innerHTML = `<img src="${imgCache[`${this.preferences[this.mode] == 'candlestick' ? 'candle' : 'line'}-chart`].src}">${this.preferences[this.mode][0].toUpperCase() + this.preferences[this.mode].slice(1)}`;
 
-            //     const serie = this.series[this.mode];
-            //     serie.config = Object.assign({}, this.config[e.id.split('style-')[1]]);
-            //     const history = await this.getHistory(this.timeframe);
+                    this.setCookie();
+                    this.queryHistory = false;
+                }
+            });
 
-            //     this.obj.removeSeries(serie.series);
-            //     serie.series = null;
-
-            //     this.update(history);
-
-            //     serie.series.applyOptions({ visible: serie.visible });
-
-            //     e.innerHTML = text;
-
-            //     this.setCookie();
-            // }));
-
-
+            this.setTheme('dark');
+            document.querySelector(`#content #chart.item #chart i`).remove(); 
+            
             this.ready = true;
-
+            
             return;
         },
 
-        timeframeSwitch: async function(time, text) {
+        setMode: function(mode){
+            if (this.mode == mode || this.queryHistory){
+                return;
+            }
+            document.querySelectorAll(`#content #chart.item #toggle-container button`).forEach(a => {
+                const series = this.series[a.id];
+                if (a.id == mode) {
+                    a.classList.add('active');
+                    series.visible = true;
+                    this.mode = a.id;
+
+                    document.querySelector(`#content #chart.item #style-switcher button`).innerHTML = `<img src="${imgCache[`${this.preferences[this.mode] == 'candlestick' ? 'candle' : 'line'}-chart`].src}">${this.preferences[this.mode][0].toUpperCase() + this.preferences[this.mode].slice(1)}`;
+                }
+                else {
+                    a.classList.remove('active');
+                    series.visible = false;
+                }
+
+                if (series.series) {
+                    series.series.applyOptions({ visible: series.visible });
+                }
+            });
+        },
+
+        timeframeSwitch: async function(time) {
+            if (!this.ready){
+                await this.init();
+            }
             if (this.queryHistory){
                 return;
             }
+
+            if (time){
+                this.timeframe = time;
+            }
+            else {
+                time = this.timeframe;
+            }
+
 
             const tfswitcher = document.querySelector('#content #chart.item #timeframe-switcher button');
             tfswitcher.innerHTML = `<i class="fas fa-spin fa-cog"></i>`;
 
             this.queryHistory = true;
             const history = await this.getHistory(time);
-            tfswitcher.innerHTML = text;
+
+            const text = (time => {
+                return ({
+                    10: '10 minutes',
+                    30: '30 minutes',
+                    60: '1 hour',
+                    120: '2 hours',
+                    240: '4 hours',
+                    1440: '1 day',
+                })[time];
+            })(time);
+            tfswitcher.innerHTML = `<img src="${imgCache[`time-${time}`].src}">${text}`;
+
             this.update(history);
             this.setCookie();
             this.queryHistory = false;
@@ -641,6 +668,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             this.history = await (await fetch(`https://owlracle.info/${this.network}/history?apikey=${apiKey}&timeframe=${timeframe}&page=${page}&candles=${candles}&to=${this.lastCandle}&tokenprice=true&txfee=true`)).json();
             // console.log(this.history)
             if (this.history.error){
+                new ModalWindow({
+                    title: this.history.error,
+                    message: `<p>${this.history.message}</p><p>Reopen this window and try again.</p>`,
+                });
+
                 console.log(this.history);
 
                 if (this.history.error.status == 401){
@@ -656,36 +688,60 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    // load chart preferences cookie
-    if (cookies.get('chart')){
-        let chartCookie = null;
-        try {
-            chartCookie = JSON.parse(cookies.get('chart'));
-        }
-        catch (error){
-            console.log(error);
-            cookies.delete('chart');
-        }
 
-        // test each individually to unsure loading only valid values
-        if (chartCookie.gas){
-            chart.preferences.gas = chartCookie.gas;
-        }
-        if (chartCookie.token){
-            chart.preferences.token = chartCookie.token;
-        }
-        if (chartCookie.fee){
-            chart.preferences.fee = chartCookie.fee;
-        }
-        if (chartCookie.timeframe){
-            chart.timeframe = chartCookie.timeframe;
-        }
+    const menu = {
+        active: 'gas',
+
+        // set function for switching between menu buttons
+        init: function() {
+            document.querySelectorAll('#menu .item').forEach(e => e.addEventListener('click', () => this.setActive(e.id)));
+
+            // try to load menu cookie
+            if (cookies.get('menu')){
+                try {
+                    this.active = JSON.parse(cookies.get('menu'));
+                }
+                catch (error){
+                    console.log(error);
+                    cookies.delete('menu');
+                }
+            }
+        },
+
+        // change dom css
+        setActive: function(active) {
+            this.active = active;
+
+            document.querySelectorAll('#menu .item, #content .item').forEach(e => {
+                e.classList.remove('active');
+            });
+    
+            document.querySelector(`#content #${active}.item`).classList.add('active');
+            document.querySelector(`#menu #${active}.item`).classList.add('active');
+
+            // set cookie
+            cookies.set('menu', JSON.stringify(this.active), { expires: { days: 365 } });
+        },
+
+        getActive: function() {
+            return this.active;
+        },
+
+        setClick: function(active, fn) {
+            document.querySelector(`#menu #${active}.item`).addEventListener('click', () => fn());
+        },
+
+        click: function(active) {
+            document.querySelector(`#menu #${active || this.active}.item`).click();
+        },
     }
+    menu.init();
 
-    chart.init().then( () => {
-        chart.setTheme('dark');
-        document.querySelector(`#content #chart.item #chart i`).remove();
-    });
+    // function for gas menu button
+    menu.setClick('gas', () => networkSwitcher.reload());
+    menu.setClick('chart', () => networkSwitcher.reload());
+    menu.click();
+
 
 
     // check if user is logged with an api key

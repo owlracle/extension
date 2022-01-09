@@ -1,11 +1,14 @@
 // set the cookie utils object
 const cookies = {
-    set: function (key, value, { expires, path } = {}) {
+    set: function (key, value, { expires, path, json } = {}) {
         if (!expires) {
             expires = 86400000;
         }
         if (!path) {
             path = '/';
+        }
+        if (json){
+            value = JSON.stringify(value);
         }
 
         let expTime = 0;
@@ -27,10 +30,16 @@ const cookies = {
         return cookieString;
     },
 
-    get: function (key) {
+    get: function (key, json) {
         const cookies = document.cookie.split(';').map(e => e.trim());
         const match = cookies.filter(e => e.split('=')[0] == key);
-        return match.length ? match[0].split('=')[1] : false;
+        let value = match.length ? match[0].split('=')[1] : false;
+
+        if (value && json){
+            value = JSON.parse(value);
+        }
+
+        return value;
     },
 
     delete: function (key) {
@@ -39,7 +48,23 @@ const cookies = {
 
         document.cookie = `${key}=0;expires=${new Date().toUTCString()}`;
         return match.length > 0;
-    }
+    },
+
+    refresh: function (key, { expires, path } = {}) {
+        if (this.get(key)){
+            const optArgs = { expires: 86400000, path: '/' };
+
+            if (expires) {
+                optArgs.expires = expires;
+            }
+            if (path) {
+                optArgs.path = path;
+            }
+
+            return this.set(key, this.get(key), optArgs);
+        }
+        return false;
+    },
 };
 
 
@@ -107,7 +132,7 @@ const imgCache = (() => {
         e.icon = document.createElement('img');
         e.icon.src = `https://owlracle.info/img/${e.symbol}.png`;
     });
-    
+
     return Object.fromEntries([
         ...['candle-chart', 'line-chart'].map(e => {
             const img = document.createElement('img');

@@ -29,11 +29,10 @@ const gasTimer = {
     update: async function () {
         this.beforeUpdate();
 
-        let query = {
-            apikey: cookies.get('apikey'),
-            accept: this.cards.map(e => e.accept).join(','),
-        };
-
+        let query = { accept: this.cards.map(e => e.accept).join(',') };
+        if (cookies.get('apikey')) {
+            query.apikey = cookies.get('apikey');
+        }
         if (this.blocks) {
             query.blocks = this.blocks;
         }

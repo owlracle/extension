@@ -195,7 +195,7 @@ class Dropdown {
 
 // modal window
 class ModalWindow {
-    constructor({ title, message, className }) {
+    constructor({ title, message, className, buttons }) {
         const fog = document.createElement('div');
         fog.id = 'fog';
 
@@ -203,21 +203,89 @@ class ModalWindow {
             fog.classList.add(className);
         }
 
+        if (!buttons){
+            buttons = { 'OK': () => {}};
+        }
+
         fog.innerHTML = `<div class="modal">
                 <h2>${title}</h2>
                 <div id="content">${message}</div>
                 <div id="button-container">
-                    <button id="ok">OK</button>
+                    ${Object.keys(buttons).map(b => `<button>${b}</button>`).join('')}
                 </div>
             </div>`;
         document.body.appendChild(fog);
         fog.addEventListener('click', () => fog.remove());
         fog.querySelector('.modal').addEventListener('click', e => e.stopPropagation());
-        fog.querySelector('#ok').addEventListener('click', () => fog.remove());
+        
+        fog.querySelectorAll('#button-container button').forEach((b,i) => {
+            b.addEventListener('click', () => {
+                Object.values(buttons)[i](fog);
+                fog.remove();
+            });
+        });
 
         return this;
     }
 }
 
 
-export { cookies, network, imgCache, ModalWindow, Dropdown };
+const menu = {
+    active: 'gas',
+
+    // set function for switching between menu buttons
+    init: function() {
+        document.querySelectorAll('#menu .item').forEach(e => e.addEventListener('click', () => this.setActive(e.id)));
+
+        // try to load menu cookie
+        if (cookies.get('menu')){
+            try {
+                this.active = JSON.parse(cookies.get('menu'));
+            }
+            catch (error){
+                console.log(error);
+                cookies.delete('menu');
+            }
+        }
+    },
+
+    // change dom css
+    setActive: function(active) {
+        this.active = active;
+
+        document.querySelectorAll('#menu .item, #content .item').forEach(e => {
+            e.classList.remove('active');
+        });
+
+        document.querySelector(`#content #${active}.item`).classList.add('active');
+        document.querySelector(`#menu #${active}.item`).classList.add('active');
+
+        // set cookie
+        cookies.set('menu', JSON.stringify(this.active), { expires: { days: 365 } });
+    },
+
+    getActive: function() {
+        return this.active;
+    },
+
+    setClick: function(active, fn) {
+        document.querySelector(`#menu #${active}.item`).addEventListener('click', () => fn());
+    },
+
+    click: function(active) {
+        document.querySelector(`#menu #${active || this.active}.item`).click();
+    },
+
+    hide: function() {
+        document.querySelectorAll('#header, #menu').forEach(e => e.classList.add('hidden'));
+        return this;
+    },
+    
+    show: function() {
+        document.querySelectorAll('#header, #menu').forEach(e => e.classList.remove('hidden'));
+        return this;
+    },
+}
+
+
+export { cookies, network, imgCache, ModalWindow, Dropdown, menu };

@@ -363,7 +363,21 @@ export default {
     getHistory: async function (timeframe = 60, page = 1, candles = this.candles) {
         this.network = network.get().symbol;
         this.timeframe = timeframe;
-        this.history = await (await fetch(`https://owlracle.info/${this.network}/history?apikey=${cookies.get('apikey')}&timeframe=${timeframe}&page=${page}&candles=${candles}&to=${this.lastCandle}&tokenprice=true&txfee=true`)).json();
+
+        let query = {
+            timeframe: timeframe,
+            page: page,
+            candles: candles,
+            to: this.lastCandle,
+            tokenprice: true,
+            txfee: true,
+        };
+        if (cookies.get('apikey')) {
+            query.apikey = cookies.get('apikey');
+        }
+
+        query = new URLSearchParams(query).toString();
+        this.history = await (await fetch(`https://owlracle.info/${this.network}/history?${query}`)).json();
         // console.log(this.history)
         if (this.history.error) {
             new ModalWindow({

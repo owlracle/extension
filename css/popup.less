@@ -180,14 +180,17 @@ body {
         .gas {
             border-radius: 3px;
             border: 1px solid var(--border-color);
-            width: 100%;
+            width: 90%;
+            height: 100px;
             display: flex;
             align-items: center;
             transition: 0.3s all;
-    
+            background-color: var(--bg-intense-color);
+            box-shadow: 0px 0px 15px #74747424;
+            margin: 5px 0;
+
             &:hover {
-                background-color: var(--bg-intense-color);
-                width: 90%;
+                background-color: var(--bg-color);
             }
     
             .title {
@@ -232,6 +235,10 @@ body {
                 width: 50%;
                 padding-left: 30px;
     
+                .gwei {
+                    font-weight: bold;
+                }
+
                 .usd {
                     font-size: 1rem;
                     opacity: 0.7;
@@ -249,9 +256,11 @@ body {
 
         .row {
             display: flex;
-            justify-content: space-between;
+            justify-content: space-evenly;
             align-items: center;
             margin-bottom: 10px;
+            width: 100%;
+            padding: 0 10px;
         }
 
         #style-switcher, #timeframe-switcher {
@@ -506,8 +515,8 @@ body {
         display: flex;
         align-items: center;
         height: 30px;
-        background-color: #3498db67;
-        border-bottom: 1px solid #3498db61;
+        background-color: #3f789edb;
+        border-bottom: 1px solid #4e8ab399;
         box-sizing: border-box;
         transition: 0.3s all;
         cursor: pointer;
@@ -515,7 +524,7 @@ body {
         color: var(--text-color);
         
         &:hover {
-            background-color: #3498db;
+            background-color: #3b8bc0;
         }
 
         .icon {

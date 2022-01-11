@@ -74,6 +74,14 @@ const api = {
             return;
         }
 
+        const container = document.querySelector('#content #key');
+        
+        // puts loading animation only it is not already showing old api key information
+        if (!container.querySelector('#content') || !container.querySelector('#content').classList.contains('key-info')){
+            container.innerHTML = '<i class="fas fa-spin fa-cog"></i>';
+            container.classList.add('loading');
+        }
+
         const data = await (await fetch(`https://owlracle.info/keys/${apiKey}`)).json();
         if (data.error){
             new ModalWindow({
@@ -89,7 +97,7 @@ const api = {
 
         cookies.refresh('apikey');
 
-        const container = document.querySelector('#content #key');
+        container.classList.remove('loading');
         container.innerHTML = `
             <div id="content" class="logged key-info">
                 <div class="row">
@@ -166,7 +174,10 @@ const api = {
                 return;
             }
 
+            const text = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-spin fa-cog"></i>';
             const data = await (await fetch(`https://owlracle.info/keys/${input.value.toLowerCase()}`)).json();
+            button.innerHTML = text;
             if (data.error && data.status == 401){
                 this.showTip('Could not find your api key');
                 return;

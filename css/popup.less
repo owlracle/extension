@@ -504,9 +504,12 @@ body {
                 button {
                     width: 80%;
                     box-sizing: border-box;
-                    box-shadow: none;
                     margin-bottom: 25px;
                     box-shadow: 0px 0px 15px #74747424;
+
+                    i {
+                        margin-right: 10px;
+                    }
                 }
 
                 a {
@@ -514,6 +517,40 @@ body {
                     font-size: 1.1rem;
                     color: #3b8bc0;
                     cursor: pointer;
+                }
+            }
+
+            &.key-info {
+
+                .row {
+                    display: flex;
+                    width: 80%;
+                }
+
+                input {
+                    margin: 0 5px;
+                    flex-grow: 1;
+                    color: var(--text-color);
+                    margin-bottom: 15px;
+                    font-family: monospace;
+                }
+
+                span {
+                    margin-bottom: 5px;
+                    text-align: left;
+                    padding: 0 10px;
+                    font-size: 0.9rem;
+                    flex-grow: 1;
+                    flex-basis: 0;
+                    opacity: 0.7;
+                }
+
+                a {
+                    font-size: 0.9rem;
+                }
+
+                button {
+                    margin-top: 20px;
                 }
             }
         }
@@ -527,6 +564,11 @@ body {
             justify-content: space-evenly;
             background-color: var(--main-color);
             box-sizing: border-box;
+
+            &.logged {
+                background-color: transparent;
+                border: none;
+            }
 
             .item {
                 transition: 0.3s all;

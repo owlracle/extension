@@ -1,6 +1,14 @@
 import { cookies, ModalWindow, menu } from './utils.js';
 
 const api = {
+    footer: `
+        <a class="item" href="https://github.com/owlracle" target="_blank"><i class="fa-brands fa-github"></i></a>
+        <a class="item" href="https://t.me/owlracle" target="_blank"><i class="fa-brands fa-telegram"></i></a>
+        <a class="item" href="https://twitter.com/owlracleapi" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+        <a class="item" href="https://facebook.com/owlracle" target="_blank"><i class="fa-brands fa-facebook"></i></a>
+        <a class="item" href="https://medium.com/@owlracleapi" target="_blank"><i class="fa-brands fa-medium"></i></a>
+    `,
+
     check: function() {
         const logged = cookies.get('logged');
         if (!logged){
@@ -26,13 +34,7 @@ const api = {
                 <button id="login">Login with Existing Api Key</button>
                 <button id="guest">Continue as Guest</button>
             </div>
-            <div id="footer">
-                <a class="item" href="https://github.com/owlracle" target="_blank"><i class="fa-brands fa-github"></i></a>
-                <a class="item" href="https://t.me/owlracle" target="_blank"><i class="fa-brands fa-telegram"></i></a>
-                <a class="item" href="https://twitter.com/owlracleapi" target="_blank"><i class="fa-brands fa-twitter"></i></a>
-                <a class="item" href="https://facebook.com/owlracle" target="_blank"><i class="fa-brands fa-facebook"></i></a>
-                <a class="item" href="https://medium.com/@owlracleapi" target="_blank"><i class="fa-brands fa-medium"></i></a>
-            </div>
+            <div id="footer">${this.footer}</div>
         `;
 
         menu.hide();
@@ -64,18 +66,59 @@ const api = {
     },
 
     // info page, when user is logged as guest
-    showInfo: function() {
-        const apiKey = cookies.get('apikey');
+    showInfo: async function() {
+        const apiKey = cookies.get('apikey', true);
 
         if (!apiKey) {
             this.showGuestInfo();
             return;
         }
 
+        const data = await (await fetch(`https://owlracle.info/keys/${apiKey}`)).json();
+        if (data.error){
+            new ModalWindow({
+                title: 'Session expired',
+                message: 'Your session has expired. Please log in again with your api key.'
+            });
+
+            cookies.delete('apikey');
+            cookies.delete('logged');
+            menu.click('key');
+            return;
+        }
+
         cookies.refresh('apikey');
-        console.log('logged in');
+
         const container = document.querySelector('#content #key');
-        container.innerHTML = '';
+        container.innerHTML = `
+            <div id="content" class="logged key-info">
+                <div class="row">
+                    <span>Api Key</span>
+                    <span>Credit</span>
+                </div>
+                <div class="row">
+                    <input value="${data.apiKey.slice(0,4)}...${data.apiKey.slice(-4)}" readonly>
+                    <input value="$${parseFloat(data.credit).toFixed(4)}" readonly>
+                </div>
+                <div class="row">
+                    <span>Usage 1h</span>
+                    <span>Usage Total</span>
+                </div>
+                <div class="row">
+                    <input value="${data.usage.apiKeyHour}" readonly>
+                    <input value="${data.usage.apiKeyTotal}" readonly>
+                </div>
+                <button id="logout"><i class="fa-solid fa-right-from-bracket"></i>LOGOUT</button>
+                <a href="https://owlracle.info/?action=keys&apikey=${data.apiKey}" target="_blank">Visit owlracle.info for more information</a>
+            </div>
+            <div id="footer" class="logged">${this.footer}</div>
+        `;
+
+        container.querySelector('#logout').addEventListener('click', () => {
+            cookies.delete('apikey');
+            cookies.delete('logged');
+            menu.click('key');
+        })
     },
 
     showGuestInfo: function() {
@@ -86,12 +129,12 @@ const api = {
             <span>${ logged ? `Log in with an api key to increase your request limit` : `Log in using your api key` }</span>
             <input placeholder="YOUR_API_KEY">
             <span id="tip"></span>
-            <button id="login">LOG IN</button>
+            <button id="login"><i class="fa-solid fa-right-to-bracket"></i>LOG IN</button>
             ${ logged ? `
                 <span class="small">or</span>
                 <a>Create New Api Key</a>
             ` : `
-                <button id="back">BACK</button>
+                <button id="back"><i class="fa-solid fa-arrow-left"></i>BACK</button>
             `}
         </div>`;
         
@@ -165,7 +208,7 @@ const api = {
     },
 
     newApiKey: function() {
-        console.log('new key');
+        window.open('https://owlracle.info/?action=newkey');
     }
 }
 

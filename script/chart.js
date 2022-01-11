@@ -1,4 +1,4 @@
-import { network, cookies, imgCache, Dropdown, ModalWindow } from './utils.js';
+import { network, cookies, imgCache, Dropdown, ModalWindow, menu } from './utils.js';
 
 // create price chart
 export default {
@@ -373,7 +373,7 @@ export default {
             txfee: true,
         };
         if (cookies.get('apikey')) {
-            query.apikey = cookies.get('apikey');
+            query.apikey = cookies.get('apikey', true);
         }
 
         query = new URLSearchParams(query).toString();
@@ -382,7 +382,11 @@ export default {
         if (this.history.error) {
             new ModalWindow({
                 title: this.history.error,
-                message: `<p>${this.history.message}</p><p>Reopen this window and try again.</p>`,
+                message: this.history.message,
+                buttons: {
+                    'LOGIN': () => menu.click('key'),
+                    'CLOSE': () => {}
+                }
             });
 
             console.log(this.history);

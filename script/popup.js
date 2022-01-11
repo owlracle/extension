@@ -1,30 +1,31 @@
 import gasTimer from './gas.js';
 import chart from './chart.js';
 import api from './api.js';
-import { network, cookies, Dropdown, menu } from './utils.js';
+import { cookies, menu, Dropdown, network } from './utils.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // cookies.delete('apikey');
+    menu.init();
+    gasTimer.init();
+    chart.init();
 
     const networkSwitcher = {
         element: document.querySelector('#network-btn'),
         bound: false,
-
+    
         reload: function() {
             if (!this.bound){
                 this.bound = true;
                 this.bindClick();
-                gasTimer.init();
-                chart.init();
+                this.element.classList.remove('hidden');
             }
-
+    
             document.querySelector('#header #link').href = `https://owlracle.info/${network.get().symbol}`;
-
+    
             this.element.removeAttribute('class');
             this.element.classList.add(network.get().symbol);
             this.element.querySelector('img').src = `https://owlracle.info/img/${network.get().symbol}.png`;
             this.element.querySelector('span').innerHTML = network.get().name;
-
+    
             if (menu.getActive() == 'gas'){
                 gasTimer.update();
             }
@@ -32,11 +33,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 chart.timeframeSwitch();
             }
         },
-
+    
         get: function() {
             return this.element;
         },
-
+    
         bindClick: function() {
             // network button action
             new Dropdown({
@@ -49,8 +50,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
     };
-
-    menu.init();
 
     // function for gas menu button
     menu.setClick('gas', () => networkSwitcher.reload());

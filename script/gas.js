@@ -1,4 +1,4 @@
-import { network, ModalWindow, cookies } from './utils.js';
+import { network, ModalWindow, cookies, menu } from './utils.js';
 
 const gasTimer = {
     cards: [ // preferences for cards
@@ -31,7 +31,7 @@ const gasTimer = {
 
         let query = { accept: this.cards.map(e => e.accept).join(',') };
         if (cookies.get('apikey')) {
-            query.apikey = cookies.get('apikey');
+            query.apikey = cookies.get('apikey', true);
         }
         if (this.blocks) {
             query.blocks = this.blocks;
@@ -43,11 +43,15 @@ const gasTimer = {
         query = new URLSearchParams(query).toString();
         const data = await (await fetch(`https://owlracle.info/${network.get().symbol}/gas?${query}`)).json();
 
-        if (data.error) {
+        if (data.error && data.status == 403) {
             console.log(data);
             new ModalWindow({
                 title: data.error,
-                message: `<p>${data.message}</p><p>Reopen this window and try again.</p>`,
+                message: data.message,
+                buttons: {
+                    'LOGIN': () => menu.click('key'),
+                    'CLOSE': () => {}
+                }
             });
         }
         else {

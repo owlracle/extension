@@ -230,6 +230,7 @@ class ModalWindow {
 }
 
 
+// footer menu
 const menu = {
     active: 'gas',
 

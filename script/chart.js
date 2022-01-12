@@ -1,4 +1,4 @@
-import { network, cookies, imgCache, Dropdown, ModalWindow, menu } from './utils.js';
+import { network, cookies, imgCache, Dropdown, ModalWindow, menu } from './utils.min.js';
 
 // create price chart
 export default {
@@ -52,7 +52,7 @@ export default {
         if (cookies.get('chart')) {
             let chartCookie = null;
             try {
-                chartCookie = JSON.parse(cookies.get('chart'));
+                chartCookie = cookies.get('chart', true);
             }
             catch (error) {
                 console.log(error);
@@ -280,7 +280,7 @@ export default {
     setCookie: function () {
         const cookieChart = Object.fromEntries(Object.entries(this.series).map(([k, v]) => [k, v.config.style]));
         cookieChart.timeframe = this.timeframe;
-        cookies.set('chart', JSON.stringify(cookieChart), { expires: { days: 365 } });
+        cookies.set('chart', cookieChart, { json: true });
     },
 
     update: function (data) {
@@ -373,7 +373,7 @@ export default {
             txfee: true,
         };
         if (cookies.get('apikey')) {
-            query.apikey = cookies.get('apikey', true);
+            query.apikey = cookies.get('apikey');
         }
 
         query = new URLSearchParams(query).toString();

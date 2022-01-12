@@ -1,4 +1,4 @@
-import { cookies, ModalWindow, menu } from './utils.js';
+import { cookies, ModalWindow, menu } from './utils.min.js';
 
 const api = {
     footer: `
@@ -47,7 +47,7 @@ const api = {
                 buttons: {
                     'YES': () => {
                         menu.show().click('gas');
-                        cookies.set('logged', true, { json: true });
+                        cookies.set('logged', true);
                     },
                     'NO': () => {},
                 }
@@ -67,7 +67,7 @@ const api = {
 
     // info page, when user is logged as guest
     showInfo: async function() {
-        const apiKey = cookies.get('apikey', true);
+        const apiKey = cookies.get('apikey');
 
         if (!apiKey) {
             this.showGuestInfo();
@@ -183,8 +183,8 @@ const api = {
                 return;
             }
 
-            cookies.set('logged', true, { json: true });
-            cookies.set('apikey', data.apiKey, { json: true });
+            cookies.set('logged', true);
+            cookies.set('apikey', data.apiKey);
             menu.show().click('gas');
         });
 

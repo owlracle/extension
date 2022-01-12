@@ -1,8 +1,20 @@
 // set the cookie utils object
 const cookies = {
     set: function (key, value, { expires, path, json } = {}) {
-        if (!expires) {
-            expires = 86400000;
+        let expTime = 0;
+        if (expires) {
+            if (typeof expires === "object") {
+                expTime += (expires.seconds * 1000) || 0;
+                expTime += (expires.minutes * 1000 * 60) || 0;
+                expTime += (expires.hours * 1000 * 60 * 60) || 0;
+                expTime += (expires.days * 1000 * 60 * 60 * 24) || 0;
+            }
+            else {
+                expTime = expires;
+            }
+
+            const now = new Date();
+            expTime = now.setTime(now.getTime() + expTime);    
         }
         if (!path) {
             path = '/';
@@ -11,21 +23,8 @@ const cookies = {
             value = JSON.stringify(value);
         }
 
-        let expTime = 0;
-        if (typeof expires === "object") {
-            expTime += (expires.seconds * 1000) || 0;
-            expTime += (expires.minutes * 1000 * 60) || 0;
-            expTime += (expires.hours * 1000 * 60 * 60) || 0;
-            expTime += (expires.days * 1000 * 60 * 60 * 24) || 0;
-        }
-        else {
-            expTime = expires;
-        }
-
-        const now = new Date();
-        expTime = now.setTime(now.getTime() + expTime);
-
-        const cookieString = `${key}=${value};expires=${new Date(expTime).toUTCString()};path=${path}`;
+        expTime = expTime > 0 ? `;expires=${new Date(expTime).toUTCString()}` : '';
+        const cookieString = `${key}=${value}${expTime};path=${path}`;
         document.cookie = cookieString;
         return cookieString;
     },
@@ -52,7 +51,7 @@ const cookies = {
 
     refresh: function (key, { expires, path } = {}) {
         if (this.get(key)){
-            const optArgs = { expires: 86400000, path: '/' };
+            const optArgs = { path: '/' };
 
             if (expires) {
                 optArgs.expires = expires;
@@ -117,7 +116,7 @@ const network = {
     },
 
     set: function (name) {
-        cookies.set('network', name, { expires: { days: 365 } });
+        cookies.set('network', name);
     },
 
     getList: function () {
@@ -241,7 +240,7 @@ const menu = {
         // try to load menu cookie
         if (cookies.get('menu')){
             try {
-                this.active = JSON.parse(cookies.get('menu'));
+                this.active = cookies.get('menu');
             }
             catch (error){
                 console.log(error);
@@ -262,7 +261,7 @@ const menu = {
         document.querySelector(`#menu #${active}.item`).classList.add('active');
 
         // set cookie
-        cookies.set('menu', JSON.stringify(this.active), { expires: { days: 365 } });
+        cookies.set('menu', this.active);
     },
 
     getActive: function() {

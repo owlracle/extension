@@ -1,8 +1,0 @@
-{
-    "less.compile": {
-        "compress": true,
-        "main": [
-            "popup.less"
-        ]
-    }
-}

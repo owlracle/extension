@@ -21,5 +21,6 @@
     },
     "permissions": [
         "cookies"
-    ]
+    ],
+    "update_URL": "https://edge.microsoft.com/extensionwebstorebase/v1/crx"
 }

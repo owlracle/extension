@@ -1,6 +1,6 @@
-<p align="center"><img src="https://user-images.githubusercontent.com/19828711/149074903-e46ed950-7f17-4546-9663-58c963bb330b.png"></p>
-
 # Owlracle extension
+
+<p align="center"><img src="https://user-images.githubusercontent.com/19828711/149074903-e46ed950-7f17-4546-9663-58c963bb330b.png"></p>
 
 This is a Chrome extension for the Owlracle service.
 If you don't know about Owlracle, I reccomend you to visit [our website](https://owlracle.info).
@@ -16,7 +16,7 @@ Asked by the community, now Owlracle can be used without leaving your current ta
 * Click on _Load unpacked_ button, and select the folder you just put the zip contents into.
 * Done!
 
-# Usage
+## Usage
 
 Just click on the new extension button that just appeared on yout browser. A popup will show.
 

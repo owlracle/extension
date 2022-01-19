@@ -1,7 +1,7 @@
 import gasTimer from './gas.min.js';
 import chart from './chart.min.js';
 import api from './api.min.js';
-import { cookies, menu, Dropdown, network } from './utils.min.js';
+import { login, menu, Dropdown, network } from './utils.min.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     menu.init();
@@ -57,8 +57,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     menu.setClick('key', () => api.check());
 
     // check if user is logged with an api key
+
+    // refresh cookies
+    if (login.get('apikey')){
+        login.refresh();
+    }
+
     let menuOpt = null;
-    if (!cookies.get('logged')){
+    if (!login.get('logged')){
         menuOpt = 'key';
     }
     

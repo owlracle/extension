@@ -1,4 +1,4 @@
-import { network, ModalWindow, cookies, menu } from './utils.min.js';
+import { network, ModalWindow, login, menu } from './utils.min.js';
 
 const gasTimer = {
     cards: [ // preferences for cards
@@ -30,8 +30,8 @@ const gasTimer = {
         this.beforeUpdate();
 
         let query = { accept: this.cards.map(e => e.accept).join(',') };
-        if (cookies.get('apikey')) {
-            query.apikey = cookies.get('apikey');
+        if (login.get('apikey')) {
+            query.apikey = login.get('apikey');
         }
         if (this.blocks) {
             query.blocks = this.blocks;

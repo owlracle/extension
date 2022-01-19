@@ -1,4 +1,4 @@
-import { cookies, ModalWindow, menu } from './utils.min.js';
+import { login, ModalWindow, menu } from './utils.min.js';
 
 const api = {
     footer: `
@@ -10,13 +10,12 @@ const api = {
     `,
 
     check: function() {
-        const logged = cookies.get('logged');
-        if (!logged){
+        const lg = login.get('logged');
+        if (!lg){
             this.showWelcome();
             return false;
         }
 
-        cookies.refresh('logged');
         this.showInfo();
         return true;
     },
@@ -47,7 +46,7 @@ const api = {
                 buttons: {
                     'YES': () => {
                         menu.show().click('gas');
-                        cookies.set('logged', true);
+                        login.set({ logged: true });
                     },
                     'NO': () => {},
                 }
@@ -67,7 +66,7 @@ const api = {
 
     // info page, when user is logged as guest
     showInfo: async function() {
-        const apiKey = cookies.get('apikey');
+        const apiKey = login.get('apikey');
 
         if (!apiKey) {
             this.showGuestInfo();
@@ -89,13 +88,10 @@ const api = {
                 message: 'Your session has expired. Please log in again with your api key.'
             });
 
-            cookies.delete('apikey');
-            cookies.delete('logged');
+            login.delete(['apikey', 'logged']);
             menu.click('key');
             return;
         }
-
-        cookies.refresh('apikey');
 
         container.classList.remove('loading');
         container.innerHTML = `
@@ -105,16 +101,16 @@ const api = {
                     <span>Credit</span>
                 </div>
                 <div class="row">
-                    <input value="${data.apiKey.slice(0,4)}...${data.apiKey.slice(-4)}" readonly>
-                    <input value="$${parseFloat(data.credit).toFixed(4)}" readonly>
+                    <input class="input" value="${data.apiKey.slice(0,4)}...${data.apiKey.slice(-4)}" readonly>
+                    <input class="input" value="$${parseFloat(data.credit).toFixed(4)}" readonly>
                 </div>
                 <div class="row">
                     <span>Usage 1h</span>
                     <span>Usage Total</span>
                 </div>
                 <div class="row">
-                    <input value="${data.usage.apiKeyHour}" readonly>
-                    <input value="${data.usage.apiKeyTotal}" readonly>
+                    <input class="input" value="${data.usage.apiKeyHour}" readonly>
+                    <input class="input" value="${data.usage.apiKeyTotal}" readonly>
                 </div>
                 <button id="logout"><i class="fa-solid fa-right-from-bracket"></i>LOGOUT</button>
                 <a href="https://owlracle.info/?action=keys&apikey=${data.apiKey}" target="_blank">Visit owlracle.info for more information</a>
@@ -123,20 +119,20 @@ const api = {
         `;
 
         container.querySelector('#logout').addEventListener('click', () => {
-            cookies.delete('apikey');
-            cookies.delete('logged');
+            login.delete(['apikey', 'logged']);
             menu.click('key');
         })
     },
 
     showGuestInfo: function() {
-        const logged = cookies.get('logged');
+        const logged = login.get('logged');
 
         const container = document.querySelector('#content #key');
         container.innerHTML = `<div id="content" class="logged">
             <span>${ logged ? `Log in with an api key to increase your request limit` : `Log in using your api key` }</span>
-            <input placeholder="YOUR_API_KEY">
+            <input class="input" placeholder="YOUR_API_KEY">
             <span id="tip"></span>
+            <label><input type="checkbox" class="checkbox">Remember api key</label>
             <button id="login"><i class="fa-solid fa-right-to-bracket"></i>LOG IN</button>
             ${ logged ? `
                 <span class="small">or</span>
@@ -146,7 +142,8 @@ const api = {
             `}
         </div>`;
         
-        const input = container.querySelector('input');
+        const input = container.querySelector('.input');
+        const checkbox = container.querySelector('.checkbox');
         const button = container.querySelector('#login');
         const linkNew = container.querySelector('a');
         const regex = new RegExp(/^[a-f0-9]{32}$/);
@@ -183,8 +180,20 @@ const api = {
                 return;
             }
 
-            cookies.set('logged', true);
-            cookies.set('apikey', data.apiKey);
+            // do not expire cookie after broser close
+            const opt = {
+                logged: true,
+                apikey: data.apiKey
+            };
+
+            if (checkbox.checked){
+                opt.persist = true;
+            }
+            else if (login.get('persist')) {
+                login.delete('persist');
+            }
+            login.set(opt);
+
             menu.show().click('gas');
         });
 

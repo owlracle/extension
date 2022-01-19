@@ -67,6 +67,60 @@ const cookies = {
 };
 
 
+const login = {
+    set: function(args) {
+        const login = cookies.get('login', true) || {};
+
+        Object.entries(args).forEach(([k,v]) => login[k] = v);
+
+        const opt = { json: true };
+        if (login.persist){
+            opt.expires = { days: 365 };
+        }
+        cookies.set('login', login, opt);
+    },
+
+    refresh: function() {
+        this.set({});
+    },
+
+    get: function(field){
+        const login = cookies.get('login', true);
+
+        if (!login){
+            return false;
+        }
+        if (!field){
+            return login;
+        }
+        if (!login[field]){
+            return false;
+        }
+        return login[field];
+    },
+
+    delete: function(fields){
+        if (!Array.isArray(fields)){
+            fields = [fields];
+        }
+
+        const login = cookies.get('login', true);
+
+        fields.forEach(f => {
+            if (login && login[f]){
+                delete login[f];
+            }
+        });
+
+        const opt = { json: true };
+        if (login.persist){
+            opt.expires = { days: 365 };
+        }
+        cookies.set('login', login, opt);
+    }
+}
+
+
 // set the corresponding network in header
 const network = {
     list: {
@@ -288,4 +342,4 @@ const menu = {
 }
 
 
-export { cookies, network, imgCache, ModalWindow, Dropdown, menu };
+export { cookies, login, network, imgCache, ModalWindow, Dropdown, menu };

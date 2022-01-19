@@ -1,3 +1,4 @@
 #!/bin/bash
 cd ..
-zip release/release.zip css/*.css script/*.min.js img/* popup.html manifest.json
+VERSION="1.0.1"
+zip "release/owlracle-ext-v$VERSION.zip" css/*.css script/*.min.js img/* popup.html manifest.json

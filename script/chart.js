@@ -1,4 +1,4 @@
-import { network, cookies, imgCache, Dropdown, ModalWindow, menu } from './utils.min.js';
+import { network, cookies, login, imgCache, Dropdown, ModalWindow, menu } from './utils.min.js';
 
 // create price chart
 export default {
@@ -372,8 +372,8 @@ export default {
             tokenprice: true,
             txfee: true,
         };
-        if (cookies.get('apikey')) {
-            query.apikey = cookies.get('apikey');
+        if (login.get('apikey')) {
+            query.apikey = login.get('apikey');
         }
 
         query = new URLSearchParams(query).toString();

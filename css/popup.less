@@ -473,7 +473,7 @@ body {
                     }
                 }
 
-                input {
+                .input {
                     padding: 10px 15px;
                     margin-bottom: 25px;
                     border-radius: 3px;
@@ -494,6 +494,24 @@ body {
 
                     &.red {
                         border-color: #cc0000;
+                    }
+                }
+
+                label {
+                    transition: 0.2s all;
+                    cursor: pointer;
+                    margin-bottom: 20px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+
+                    &:hover {
+                        color: var(--text-dark-intense-color);
+                    }
+                    
+                    .checkbox {
+                        transform: scale(1.6);
+                        margin-right: 10px;
                     }
                 }
 

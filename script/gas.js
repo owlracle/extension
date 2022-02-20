@@ -29,7 +29,10 @@ const gasTimer = {
     update: async function () {
         this.beforeUpdate();
 
-        let query = { accept: this.cards.map(e => e.accept).join(',') };
+        let query = {
+            accept: this.cards.map(e => e.accept).join(','),
+            source: 'extension'
+        };
         if (login.get('apikey')) {
             query.apikey = login.get('apikey');
         }

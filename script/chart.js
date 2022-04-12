@@ -5,7 +5,7 @@ export default {
     ready: false,
     timeframe: 60,
     page: 1,
-    candles: 200,
+    candles: 1000,
     lastCandle: (new Date().getTime() / 1000).toFixed(0),
     allRead: false,
     network: network.get().symbol,

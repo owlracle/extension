@@ -10,6 +10,7 @@
 .ht { @chain-color: #01943f; }
 .one { @chain-color: #00d8af; }
 .celo { @chain-color: #35cf7f; }
+.fuse { @chain-color: #b3c05d; }
 
 body {
     font-family: 'Roboto', Helvetica, Arial, sans-serif;
@@ -155,6 +156,12 @@ body {
 
             &.ht {
                 .ht();
+                background-color: darken(@chain-color, 20%);
+                border-color: @chain-color;
+            }
+
+            &.fuse {
+                .fuse();
                 background-color: darken(@chain-color, 20%);
                 border-color: @chain-color;
             }

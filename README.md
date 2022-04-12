@@ -9,18 +9,22 @@ Asked by the community, now Owlracle can be used without leaving your current ta
 
 ## Installation
 
-**We are still waiting on the Chrome Web Store Approval**. If you dont want to wait, you can just download the [owlracle-ext-v1.0.zip](https://github.com/owlracle/extension/releases/tag/1.0) file from the release page.
+Go to either [Chrome Web Store](https://microsoftedge.microsoft.com/addons/detail/owlracle/abfaclffknadhdmfojckfkkcfakcngfd?hl=en-US) or [Microsoft Edge Add-ons](https://chrome.google.com/webstore/detail/owlracle/gnedoldjklhjjhmcfpilokboppbceclh?hl=en-US) page and install the extension on your browser.
 
+Alternatively, you could also download the [lastest release](https://github.com/owlracle/extension/releases) and manually install it.
+
+* Download the zip file from the desired release.
 * Extract the file contents into an empty folder.
 * Head to the chrome extension settings: (_chrome://extensions/_) and make sure _Developer Mode_ is checked.
 * Click on _Load unpacked_ button, and select the folder you just put the zip contents into.
 * Done!
 
+
 ## Usage
 
 Just click on the new extension button that just appeared on yout browser. A popup will show.
 
-Once opened, you must choose to login with your API key or use a guest login. Every request made on the extension will count towards your api key limit. Note that using an api key will grant you a much higher usage limit. Refer to the api limits on [our website](https://owlracle.info).
+Once opened, you must choose to login with your API key or use a guest login. Eved the api limits on [our website](https://owlracle.info).
 
 The extension have three menu buttons located in the bottom.
 
@@ -51,34 +55,39 @@ That is it! I hope you enjoyed our extension and this breif tutorial.
 
 ---
 
-### Contact us:
+## Contact us:
 
-<a href="https://twitter.com/owlracleAPI">
-<img src="https://img.shields.io/badge/Twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white">
-</a>
-
-<a href="https://facebook.com/owlracle">
-<img src="https://img.shields.io/badge/Facebook-1877F2?style=for-the-badge&logo=facebook&logoColor=white">
-</a>
-
-<a href="https://t.me/owlracle">
-<img src="https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white">
-</a>
-
-<a href="https://github.com/owlracle">
-<img src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white">
-</a>
+<span>
+    <a href="https://twitter.com/owlracleAPI">
+    <img src="https://img.shields.io/badge/Twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white">
+    </a>
+</span>
+<span>
+    <a href="https://facebook.com/owlracle">
+    <img src="https://img.shields.io/badge/Facebook-1877F2?style=for-the-badge&logo=facebook&logoColor=white">
+    </a>
+</span>
+<span>
+    <a href="https://t.me/owlracle">
+    <img src="https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white">
+    </a>
+</span>
+<span>
+    <a href="https://github.com/owlracle">
+    <img src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white">
+    </a>
+</span>
 
 ---
 
 ### Like what we are doing?
 
-Then support our project! We accept any token donation on <img src="https://owlracle.info/img/bsc.png" height="20"> **BSC**, <img src="https://owlracle.info/img/poly.png" height="20"> **Polygon**, <img src="https://owlracle.info/img/ftm.png" height="20"> **Fantom**, <img src="https://owlracle.info/img/eth.png" height="20"> **Ethereum**, and <img src="https://owlracle.info/img/avax.png" height="20"> **Avalanche** networks.
+Then support our project! We accept any token donation on <img src="https://owlracle.info/img/bsc.png" height="20"> **BSC**, <img src="https://owlracle.info/img/poly.png" height="20"> **Polygon**, <img src="https://owlracle.info/img/ftm.png" height="20"> **Fantom**, <img src="https://owlracle.info/img/eth.png" height="20"> **Ethereum**, <img src="https://owlracle.info/img/avax.png" height="20"> **Avalanche**, or any other EVM networks.
 
 <a href="https://user-images.githubusercontent.com/19828711/139945432-f6b07860-c986-4221-a291-10370f24ea5a.png">
 <h3 align=center><img src="https://img.shields.io/badge/Wallet-0xA6E126a5bA7aE209A92b16fcf464E502f27fb658-blue"></h3>
 <p align=center>
-	<img width="200" src="https://user-images.githubusercontent.com/19828711/139945432-f6b07860-c986-4221-a291-10370f24ea5a.png">
+    <img width="200" src="https://user-images.githubusercontent.com/19828711/139945432-f6b07860-c986-4221-a291-10370f24ea5a.png">
 </p>
 </a>
 

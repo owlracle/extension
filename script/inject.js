@@ -1,0 +1,162 @@
+const watchMessage = async function() {
+    return new Promise(resolve => {
+        const checkInt = setInterval( () => {
+            const extMessageContainer = document.querySelector('#extension-message');
+            if (extMessageContainer) {
+                const extMessage = JSON.parse(extMessageContainer.value);
+                extMessageContainer.remove();
+                clearInterval(checkInt);
+                resolve(extMessage);
+            }
+        }, 100);
+    });
+};
+
+const owlracle = {
+    url: 'https://owlracle.info',
+
+    init: function({
+        apiKey,
+        args = null,
+        verbose = 0,
+        speed = 1
+    }) {
+        this.apiKey = apiKey;
+        this.verbose = verbose;
+        this.speed = speed;
+
+        if (args) {
+            this.args = args;
+        }
+
+        this.getNetwork();
+    },
+
+    getNetwork: function() {
+        const networks = [
+            { name: 'eth', id: 1 },
+            { name: 'bsc', id: 56 },
+            { name: 'poly', id: 137 },
+            { name: 'ftm', id: 250 },
+            { name: 'avax', id: 43114 },
+            { name: 'cro', id: 25 },
+            { name: 'movr', id: 1285 },
+            { name: 'one', id: 166660000 },
+            { name: 'ht', id: 128 },
+            { name: 'celo', id: 42220 },
+            { name: 'fuse', id: 122 },
+        ];
+
+        this.network = networks.find(e => e.id == parseInt(window.ethereum.networkVersion)).name;
+
+        return this.network;
+    },
+
+    lastGas: {
+        expire: 10000,
+
+        get: async function() {
+            // implement a mutex
+            // wait for the lock release
+            await new Promise(resolve => {
+                const check = () => {
+                    if (!this.locked) {
+                        resolve(true);
+                    }
+                    setTimeout(() => check(), 100);
+                };
+                check();
+            });
+            
+            const now = new Date().getTime();
+            
+            // there a gas price not yet expired
+            if (this.value && now - this.time < this.expire) {
+                return this.value;
+            }
+            
+            // lock only if there is not gas price ready (need to fetch)
+            this.locked = true;
+            return false;
+        },
+
+        set: function(value) {
+            this.value = value;
+            this.time = new Date().getTime();
+            this.locked = false;
+        },
+    },
+
+    getGas: async function() {
+        if (!this.apiKey) {
+            console.log('No Owlracle API key provided');
+            return false;
+        }
+        // return last gas price known or false
+        let gasPrice = await this.lastGas.get();
+        if (gasPrice) {
+            return gasPrice;
+        }
+
+        const args = this.args ? '&' + new URLSearchParams(this.args).toString() : '';
+        const url = `${this.url}/${ this.getNetwork() }/gas?apikey=${this.apiKey}${args}`;
+
+        if (this.verbose) {
+            console.log(`Requesting ${url}`);
+        }
+
+        const req = await fetch(url);
+        const res = await req.json();
+
+        if (res.speeds[this.speed] && res.speeds[this.speed].gasPrice) {
+            gasPrice = res.speeds[this.speed].gasPrice;
+            this.lastGas.set(gasPrice);
+        }
+
+        return gasPrice;
+    }
+}
+
+if (window.ethereum) {
+    // console.log(window.ethereum)
+
+    const requestOverride = ethereum => {
+        // console.log(ethereum)
+        
+        // Metamask expose window.ethereum.
+        // All contract interactions go through window.ethereum.request
+        // I replace the old request method for one calling the old requests, but replcing the gasPrice argument
+        const oldReq = ethereum.request;
+        ethereum.request = async ({method, params}) => {
+            if (method == 'eth_sendTransaction' && params && params[0]) {
+                // want to really send a new tx, so request gas price for it
+                const gasPrice = await owlracle.getGas();
+                // console.log(gasPrice);
+                if (gasPrice) {
+                    params[0].gasPrice = '0x'+ parseInt(gasPrice * 1000000000).toString(16);
+                }
+            }
+            // console.log(params);
+            return oldReq({ method: method, params: params });
+        }
+    };
+
+    requestOverride(window.ethereum);
+    console.log(`🦉 You are now taking Owlracle's advice for gas price settings on your Metamask transactions 🦉`);
+    console.log(`🦉 Check our website https://owlracle.info or get in touch at https://t.me/owlracle 🦉`);
+
+    const watcherWorker = async () => {
+        const message = await watchMessage();
+
+        if (message.apiKey) {
+            owlracle.apiKey = message.apiKey.apikey;
+            console.log(owlracle.apiKey);
+        }
+
+        setTimeout(() => watcherWorker(), 100);
+    };
+    watcherWorker();
+}
+else {
+    console.log('Metamask not detected');
+}

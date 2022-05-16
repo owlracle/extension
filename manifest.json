@@ -19,6 +19,18 @@
         "128": "img/icon-128.png"
     },
     "permissions": [
-        "cookies"
-    ]
+        "cookies",
+        "activeTab"
+    ],
+    "content_scripts": [{
+        "matches": [ "*://*/*" ],
+        "js": [ "script/contentScript.min.js" ],
+        "run_at": "document_end"
+    }],
+    "web_accessible_resources": [{
+        "resources": [
+            "script/inject.min.js"
+        ],
+        "matches": [ "*://*/*" ]
+    }]
 }

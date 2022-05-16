@@ -1,7 +1,7 @@
 import gasTimer from './gas.min.js';
 import chart from './chart.min.js';
 import api from './api.min.js';
-import { login, menu, Dropdown, network } from './utils.min.js';
+import { login, menu, Dropdown, network, cookies } from './utils.min.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     menu.init();
@@ -69,4 +69,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
     menu.click(menuOpt);
+
+    // chrome.runtime.sendMessage({ apiKey: cookies.get('login') }, response => {
+    // })
+
+    chrome.tabs.query({active: true, currentWindow: true}, tabs => {
+        chrome.tabs.sendMessage(tabs[0].id, { apiKey: cookies.get('login', true) }, response => {
+            // console.log(response.farewell);
+        });
+    });
 });

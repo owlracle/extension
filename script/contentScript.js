@@ -6,12 +6,49 @@ script.type = 'module';
 script.onload = () => script.remove();
 // console.log('contentScript loaded');
 
-chrome.runtime.onMessage.addListener((message, sender, reply) => {
-    // console.log(message)
+const watchDomMessage = async id => {
+    return new Promise(resolve => {
+        const checkInt = setInterval( () => {
+            const extMessageContainer = document.querySelector('#' + id);
+            if (extMessageContainer) {
+                const extMessage = JSON.parse(extMessageContainer.value);
+                extMessageContainer.remove();
+                clearInterval(checkInt);
+                resolve(extMessage);
+            }
+        }, 100);
+    });
+}
+
+const writeDomMessage = (id, message) => {
     const el = document.createElement('input');
-    el.id = 'extension-message';
+    el.id = id;
     el.type = 'hidden';
     el.value = JSON.stringify(message);
     document.body.insertAdjacentElement('beforeend', el);
-    reply('');
+}
+
+// listen to popup, once message received create dom element to inject retrieve it
+chrome.runtime.onMessage.addListener((message, sender, reply) => {
+    // console.log(message)
+    writeDomMessage('extension-message-received', message);
+
+    // watch for reply from inject, and send reply back to popup
+    watchDomMessage('extension-message-received-reply').then(response => {
+        reply(response);
+    });
+    return true; // only when return true the reply callback can be called async
 });
+
+const watch = async () => {
+    // watch for messages sent from inject, so send them to popup
+    const message = await watchDomMessage('extension-message-sent');
+
+    // send message to popup and wait for reply to put the reply on dom
+    chrome.runtime.sendMessage(message, response => {
+        writeDomMessage('extension-message-sent-reply', response);
+    });
+
+    setTimeout(() => watch(), 100);
+}
+watch();

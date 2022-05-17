@@ -1,16 +1,56 @@
-const watchMessage = async function() {
-    return new Promise(resolve => {
-        const checkInt = setInterval( () => {
-            const extMessageContainer = document.querySelector('#extension-message');
-            if (extMessageContainer) {
-                const extMessage = JSON.parse(extMessageContainer.value);
-                extMessageContainer.remove();
-                clearInterval(checkInt);
-                resolve(extMessage);
-            }
-        }, 100);
-    });
+const messageBus = {
+    events: {},
+
+    watchDomMessage: async function(id) {
+        return new Promise(resolve => {
+            const checkInt = setInterval( () => {
+                const extMessageContainer = document.querySelector('#' + id);
+                if (extMessageContainer) {
+                    const extMessage = JSON.parse(extMessageContainer.value);
+                    extMessageContainer.remove();
+                    clearInterval(checkInt);
+                    resolve(extMessage);
+                }
+            }, 100);
+        });
+    },
+
+    // watch for dom for received messages from contentScript
+    watch: async function() {
+        const message = await this.watchDomMessage('extension-message-received');
+    
+        let replyMsg = 'Message received';
+        if (message.event && this.events[message.event]) {
+            replyMsg = await this.events[message.event](message);
+        }
+        this.writeDomMessage('extension-message-received-reply', replyMsg);
+    
+        setTimeout(() => this.watch(), 100);
+    },
+
+    // add event listener: function to be called when messages are received
+    addEvent: function(name, callback) {
+        this.events[name] = callback;
+    },
+
+    writeDomMessage: function(id, message) {
+        const el = document.createElement('input');
+        el.id = id;
+        el.type = 'hidden';
+        el.value = JSON.stringify(message);
+        document.body.insertAdjacentElement('beforeend', el);
+    },
+
+    // send message to DOM to contentScript
+    send: async function(event, message, reply) {
+        this.writeDomMessage('extension-message-sent', { event: event, message: message });
+
+        const response = await this.watchDomMessage('extension-message-sent-reply');
+        reply(response);
+    },
 };
+messageBus.watch();
+
 
 const owlracle = {
     url: 'https://owlracle.info',
@@ -144,18 +184,6 @@ if (window.ethereum) {
     requestOverride(window.ethereum);
     console.log(`🦉 You are now taking Owlracle's advice for gas price settings on your Metamask transactions 🦉`);
     console.log(`🦉 Check our website https://owlracle.info or get in touch at https://t.me/owlracle 🦉`);
-
-    const watcherWorker = async () => {
-        const message = await watchMessage();
-
-        if (message.apiKey) {
-            owlracle.apiKey = message.apiKey.apikey;
-            console.log(owlracle.apiKey);
-        }
-
-        setTimeout(() => watcherWorker(), 100);
-    };
-    watcherWorker();
 }
 else {
     console.log('Metamask not detected');

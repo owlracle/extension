@@ -78,6 +78,10 @@ const login = {
             opt.expires = { days: 365 };
         }
         cookies.set('login', login, opt);
+
+        if (login.apikey) {
+            chrome.storage.local.set({ apikey: login.apikey });
+        }
     },
 
     refresh: function() {
@@ -117,6 +121,10 @@ const login = {
             opt.expires = { days: 365 };
         }
         cookies.set('login', login, opt);
+
+        if (fields.includes('apikey')) {
+            chrome.storage.local.remove('apikey');
+        }
     }
 }
 

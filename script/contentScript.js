@@ -28,15 +28,19 @@ const writeDomMessage = (id, message) => {
     document.body.insertAdjacentElement('beforeend', el);
 }
 
+
+// write dom message and wait for reply
+const sendToDOM = async message => {
+    writeDomMessage('extension-message-received', message);
+    // watch for reply from inject, and send reply back to popup
+    return await watchDomMessage('extension-message-received-reply');
+};
+
+
 // listen to popup, once message received create dom element to inject retrieve it
 chrome.runtime.onMessage.addListener((message, sender, reply) => {
     // console.log(message)
-    writeDomMessage('extension-message-received', message);
-
-    // watch for reply from inject, and send reply back to popup
-    watchDomMessage('extension-message-received-reply').then(response => {
-        reply(response);
-    });
+    sendToDOM(message).then(response => reply(response));
     return true; // only when return true the reply callback can be called async
 });
 
@@ -52,3 +56,12 @@ const watch = async () => {
     setTimeout(() => watch(), 100);
 }
 watch();
+
+(async () => {
+    // set api key when page load
+    let storage = await chrome.storage.local.get();
+
+    if (storage.apikey) {
+        sendToDOM({ event: 'apikey', apiKey: storage.apikey });
+    }
+})();

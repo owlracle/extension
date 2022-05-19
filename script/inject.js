@@ -19,7 +19,7 @@ const messageBus = {
     watch: async function() {
         const message = await this.watchDomMessage('extension-message-received');
     
-        let replyMsg = 'Message received';
+        let replyMsg = 'Message received, but no reply given';
         if (message.event && this.events[message.event]) {
             replyMsg = await this.events[message.event](message);
         }
@@ -54,23 +54,8 @@ messageBus.watch();
 
 const owlracle = {
     url: 'https://owlracle.info',
-
-    init: function({
-        apiKey,
-        args = null,
-        verbose = 0,
-        speed = 1
-    }) {
-        this.apiKey = apiKey;
-        this.verbose = verbose;
-        this.speed = speed;
-
-        if (args) {
-            this.args = args;
-        }
-
-        this.getNetwork();
-    },
+    speed: 0,
+    args: { accept: "75" },
 
     getNetwork: function() {
         const networks = [
@@ -171,9 +156,9 @@ if (window.ethereum) {
             if (method == 'eth_sendTransaction' && params && params[0]) {
                 // want to really send a new tx, so request gas price for it
                 const gasPrice = await owlracle.getGas();
-                // console.log(gasPrice);
                 if (gasPrice) {
                     params[0].gasPrice = '0x'+ parseInt(gasPrice * 1000000000).toString(16);
+                    console.log(`🦉 Owlracle suggests: ${ gasPrice } GWei`);
                 }
             }
             // console.log(params);
@@ -182,8 +167,14 @@ if (window.ethereum) {
     };
 
     requestOverride(window.ethereum);
-    console.log(`🦉 You are now taking Owlracle's advice for gas price settings on your Metamask transactions 🦉`);
+
+    console.log(`🦉 You are taking Owlracle's advice for gas price settings on your Metamask transactions 🦉`);
     console.log(`🦉 Check our website https://owlracle.info or get in touch at https://t.me/owlracle 🦉`);
+
+    messageBus.addEvent('apikey', message => {
+        owlracle.apiKey = message.apiKey;
+        return true;
+    });
 }
 else {
     console.log('Metamask not detected');

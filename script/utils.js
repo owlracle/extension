@@ -66,6 +66,21 @@ const cookies = {
     },
 };
 
+// advisor config and methods
+const advisor = {
+    set: async function(data) {
+        const properties = await this.get();
+        Object.entries(data).forEach(([k,v]) => properties[k] = v);
+        await chrome.storage.local.set({ advisor: properties });
+        messageBus.send('advisor', properties);
+    },
+
+    // return the storage var, or wait until it is ready
+    get: async function() {
+        const storage = await chrome.storage.local.get();
+        return storage.advisor || await new Promise(resolve => setTimeout(async () => resolve(await this.get()), 100));
+    },
+};
 
 const login = {
     set: function(args) {
@@ -80,7 +95,7 @@ const login = {
         cookies.set('login', login, opt);
 
         if (login.apikey) {
-            chrome.storage.local.set({ apikey: login.apikey });
+            advisor.set({ apiKey: login.apikey });
         }
     },
 
@@ -123,7 +138,7 @@ const login = {
         cookies.set('login', login, opt);
 
         if (fields.includes('apikey')) {
-            chrome.storage.local.remove('apikey');
+            advisor.set({ apiKey: false });
         }
     }
 }
@@ -394,4 +409,4 @@ const messageBus = {
 }
 
 
-export { cookies, login, network, imgCache, ModalWindow, Dropdown, menu, messageBus };
+export { cookies, login, network, imgCache, ModalWindow, Dropdown, menu, messageBus, advisor };

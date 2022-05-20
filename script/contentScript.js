@@ -6,62 +6,103 @@ script.type = 'module';
 script.onload = () => script.remove();
 // console.log('contentScript loaded');
 
-const watchDomMessage = async id => {
-    return new Promise(resolve => {
-        const checkInt = setInterval( () => {
-            const extMessageContainer = document.querySelector('#' + id);
-            if (extMessageContainer) {
-                const extMessage = JSON.parse(extMessageContainer.value);
-                extMessageContainer.remove();
-                clearInterval(checkInt);
-                resolve(extMessage);
-            }
-        }, 100);
-    });
+const messageDOM = {
+    watchDomMessage: async function(id) {
+        return new Promise(resolve => {
+            const checkInt = setInterval( () => {
+                const extMessageContainer = document.querySelector('#' + id);
+                if (extMessageContainer) {
+                    const extMessage = JSON.parse(extMessageContainer.value);
+                    extMessageContainer.remove();
+                    clearInterval(checkInt);
+                    resolve(extMessage);
+                }
+            }, 100);
+        });
+    },
+    
+    writeDomMessage: function(id, message) {
+        const el = document.createElement('input');
+        el.id = id;
+        el.type = 'hidden';
+        el.value = JSON.stringify(message);
+        document.body.insertAdjacentElement('beforeend', el);
+    },
+    
+    
+    // write dom message and wait for reply
+    send: async function(message) {
+        this.writeDomMessage('extension-message-received', message);
+        // watch for reply from inject, and send reply back to popup
+        return await this.watchDomMessage('extension-message-received-reply');
+    },
+    
+    watch: async function() {
+        // watch for messages sent from inject, so send them to popup
+        const message = await this.watchDomMessage('extension-message-sent');
+    
+        // send message to popup and wait for reply to put the reply on dom
+        chrome.runtime.sendMessage(message, response => {
+            this.writeDomMessage('extension-message-sent-reply', response);
+        });
+    
+        setTimeout(() => this.watch(), 100);
+    },
+    
+    
 }
-
-const writeDomMessage = (id, message) => {
-    const el = document.createElement('input');
-    el.id = id;
-    el.type = 'hidden';
-    el.value = JSON.stringify(message);
-    document.body.insertAdjacentElement('beforeend', el);
-}
-
-
-// write dom message and wait for reply
-const sendToDOM = async message => {
-    writeDomMessage('extension-message-received', message);
-    // watch for reply from inject, and send reply back to popup
-    return await watchDomMessage('extension-message-received-reply');
-};
+messageDOM.watch();
 
 
 // listen to popup, once message received create dom element to inject retrieve it
 chrome.runtime.onMessage.addListener((message, sender, reply) => {
     // console.log(message)
-    sendToDOM(message).then(response => reply(response));
+
+    // received a message from popup to update advisor info
+    if (message.event == 'advisor') {
+        advisor.updateDOM().then(() => reply('ok'));
+    }
+    else {
+        messageDOM.send(message).then(response => reply(response));
+    }
+
     return true; // only when return true the reply callback can be called async
 });
 
-const watch = async () => {
-    // watch for messages sent from inject, so send them to popup
-    const message = await watchDomMessage('extension-message-sent');
 
-    // send message to popup and wait for reply to put the reply on dom
-    chrome.runtime.sendMessage(message, response => {
-        writeDomMessage('extension-message-sent-reply', response);
-    });
+// advisor config and methods
+const advisor = {
+    // set starting state for advisor properties
+    // receive storage if exists, or set a new one if doesnt
+    init: async function() {
+        const storage = await chrome.storage.local.get();
 
-    setTimeout(() => watch(), 100);
-}
-watch();
+        if (storage.advisor && typeof storage === 'object') {
+            return storage.advisor;
+        }
 
-(async () => {
-    // set api key when page load
-    let storage = await chrome.storage.local.get();
+        await chrome.storage.local.set({ advisor: { enabled: false } });
+        return { enabled: false };
+    },
 
-    if (storage.apikey) {
-        sendToDOM({ event: 'apikey', apiKey: storage.apikey });
-    }
-})();
+    // same as init, but wait until there is a storage available
+    get: async function() {
+        const storage = await chrome.storage.local.get();
+        // return the storage var, or wait until it is ready
+        return storage.advisor || await new Promise(resolve => setTimeout(async () => resolve(await this.get()), 100));
+    },
+
+    updateDOM: async function(init=false) {
+        const advProp = await (init ? this.init() : this.get());
+        if (advProp.enabled && advProp.apiKey) {
+            messageDOM.send({ event: 'advisor', apiKey: advProp.apiKey });
+        }
+        else if (!init) {
+            messageDOM.send({ event: 'advisor', apiKey: false });
+        }
+    },
+};
+
+
+// set api key when page load
+advisor.updateDOM(true);

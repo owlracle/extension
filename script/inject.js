@@ -168,11 +168,15 @@ if (window.ethereum) {
 
     requestOverride(window.ethereum);
 
-    console.log(`🦉 You are taking Owlracle's advice for gas price settings on your Metamask transactions 🦉`);
-    console.log(`🦉 Check our website https://owlracle.info or get in touch at https://t.me/owlracle 🦉`);
-
-    messageBus.addEvent('apikey', message => {
+    messageBus.addEvent('advisor', message => {
+        if (!owlracle.apiKey && message.apiKey) {
+            console.log(`🦉 You are taking Owlracle's advice for gas price settings on your Metamask transactions 🦉`);
+            console.log(`🦉 Check our website https://owlracle.info or get in touch at https://t.me/owlracle 🦉`);
+        }
+        
         owlracle.apiKey = message.apiKey;
+    
+        // console.log(owlracle.apiKey);
         return true;
     });
 }

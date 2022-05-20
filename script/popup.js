@@ -1,12 +1,13 @@
 import gasTimer from './gas.min.js';
 import chart from './chart.min.js';
 import api from './api.min.js';
-import { login, menu, Dropdown, network, messageBus, cookies } from './utils.min.js';
+import { login, menu, Dropdown, network, advisor } from './utils.min.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     menu.init();
     gasTimer.init();
     chart.init();
+    advisorDOM.init();
 
     const networkSwitcher = {
         element: document.querySelector('#network-btn'),
@@ -71,3 +72,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     menu.click(menuOpt);
 
 });
+
+const advisorDOM = {
+    init: async function() {
+        const adv = await advisor.get();
+        const container = document.querySelector('#content #advisor');
+        container.innerHTML = `<div id="content" class="logged">
+            <h2>Tx advisor</h2>
+            <label><input id="allow" type="checkbox" class="checkbox" ${ adv.enabled ? 'checked' : '' }>Allow me to suggest the best gas price to your Metamask transaction</label>
+        </div>`;
+
+        container.querySelector('#allow').addEventListener('change', function() {
+            advisor.set({ enabled: this.checked });
+        })
+    }
+}

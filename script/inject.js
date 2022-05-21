@@ -72,9 +72,9 @@ const owlracle = {
             { name: 'fuse', id: 122 },
         ];
 
-        this.network = networks.find(e => e.id == parseInt(window.ethereum.networkVersion)).name;
+        this.network = networks.find(e => e.id == parseInt(window.ethereum.networkVersion));
 
-        return this.network;
+        return this.network ? this.network.name : false;
     },
 
     lastGas: {
@@ -123,18 +123,29 @@ const owlracle = {
             return gasPrice;
         }
 
-        const args = this.args ? '&' + new URLSearchParams(this.args).toString() : '';
-        const url = `${this.url}/${ this.getNetwork() }/gas?apikey=${this.apiKey}${args}`;
-
-        if (this.verbose) {
-            console.log(`Requesting ${url}`);
+        const network = this.getNetwork();
+        if (!network) {
+            console.log('Network not supported');
+            return false;
         }
+
+        const args = this.args ? '&' + new URLSearchParams(this.args).toString() : '';
+        const url = `${this.url}/${ network }/gas?apikey=${this.apiKey}${args}`;
 
         const req = await fetch(url);
         const res = await req.json();
 
-        if (res.speeds[this.speed] && res.speeds[this.speed].gasPrice) {
-            gasPrice = res.speeds[this.speed].gasPrice;
+        const speedInfo = res.speeds[this.speed];
+        if (speedInfo && speedInfo.gasPrice) {
+            if (res.baseFee) {
+                gasPrice = {
+                    maxFeePerGas: speedInfo.gasPrice,
+                    maxPriorityFeePerGas: speedInfo.gasPrice - res.baseFee,
+                };
+            }
+            else {
+                gasPrice = { gasPrice: speedInfo.gasPrice };
+            }
             this.lastGas.set(gasPrice);
         }
 
@@ -156,9 +167,19 @@ if (window.ethereum) {
             if (method == 'eth_sendTransaction' && params && params[0]) {
                 // want to really send a new tx, so request gas price for it
                 const gasPrice = await owlracle.getGas();
-                if (gasPrice) {
-                    params[0].gasPrice = '0x'+ parseInt(gasPrice * 1000000000).toString(16);
-                    console.log(`🦉 Owlracle suggests: ${ gasPrice } GWei`);
+                if (gasPrice.gasPrice) {
+                    console.log(`🦉 Owlracle suggests: ${ gasPrice.gasPrice } GWei`);
+                    params[0].gasPrice = '0x'+ parseInt(gasPrice.gasPrice * 1000000000).toString(16);
+                    delete params[0].maxFeePerGas;
+                    delete params[0].maxPriorityFeePerGas;
+                }
+                else if (gasPrice.maxFeePerGas) {
+                    console.log(`🦉 Owlracle suggests:`);
+                    Object.entries(gasPrice).forEach(([k,v]) => {
+                        params[0][k] = '0x'+ parseInt(v * 1000000000).toString(16)
+                        console.log(`${k}: ${v} GWei`);
+                    });
+                    delete params[0].gasPrice;
                 }
             }
             // console.log(params);

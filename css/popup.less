@@ -641,6 +641,7 @@ body {
                 padding: 10px 15px;
                 width: 260px;
                 margin: auto;
+                margin-bottom: 15px;
 
                 #metamask-icon {
                     margin-right: 15px;
@@ -687,11 +688,47 @@ body {
                 }
     
                 #cost-card {
-                    width: 100px;
+                    width: 120px;
                     border-radius: 3px;
-                    border: 1px solid black;
-                    box-sizing: border-box;
-                    padding: 10px 15px;
+                    border: 1px solid var(--border-color);
+
+                    &.disabled {
+                        opacity: 0.4;
+                    }
+                    
+                    .title {
+                        background-color: var(--bg-intense-color);
+                        color: var(--text-intense-color);
+                        padding: 5px 10px;
+                        display: flex;
+                        justify-content: center;
+
+                        i {
+                            margin-left: 5px;
+                            cursor: pointer;
+                        }
+                    }
+                    
+                    .body {
+                        box-sizing: border-box;
+                        padding: 10px 15px;
+                        text-align: center;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        
+                        .value {
+                            font-family: monospace;
+                            font-size: 1.1rem;
+                        }
+
+                        .info {
+                            font-size: 0.9rem;
+                            opacity: 0.6;
+                        }
+                    }
+                    
                 }
             }
         }

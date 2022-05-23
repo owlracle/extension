@@ -89,7 +89,9 @@ const network = {
                     this.changeCallback(this.selected);
                 }
                 // send a message to contentScript so it knows when network changed
-                messageBus.send('network', { network: this.selected });
+                if (oldNetwork) {
+                    messageBus.send('network', { network: this.selected });
+                }
             }
         }, 100);
     },
@@ -100,7 +102,10 @@ network.changeWatcher();
 const owlracle = {
     url: 'https://owlracle.info',
     speed: 0,
-    args: { accept: "75" },
+    args: {
+        accept: '75',
+        source: 'advisor',
+    },
 
     lastGas: {
         expire: 10000,
@@ -154,8 +159,8 @@ const owlracle = {
             return false;
         }
 
-        const args = this.args ? '&' + new URLSearchParams(this.args).toString() : '';
-        const url = `${this.url}/${ ntw }/gas?apikey=${this.apiKey}${args}`;
+        this.args.apikey = this.apiKey;
+        const url = `${this.url}/${ ntw }/gas?${ new URLSearchParams(this.args).toString() }`;
 
         const req = await fetch(url);
         const res = await req.json();
@@ -175,7 +180,7 @@ const owlracle = {
         }
 
         return gasPrice;
-    }
+    },
 }
 
 if (window.ethereum) {
@@ -189,7 +194,11 @@ if (window.ethereum) {
         // I replace the old request method for one calling the old requests, but replcing the gasPrice argument
         const oldReq = ethereum.request;
         ethereum.request = async ({method, params}) => {
+            let change = false;
             if (method == 'eth_sendTransaction' && params && params[0]) {
+                change = true;
+            }
+            if (change){
                 // want to really send a new tx, so request gas price for it
                 const gasPrice = await owlracle.getGas();
                 if (gasPrice.gasPrice) {
@@ -207,8 +216,14 @@ if (window.ethereum) {
                     delete params[0].gasPrice;
                 }
             }
-            // console.log(params);
-            return oldReq({ method: method, params: params });
+            // console.log(params);`
+            const res = oldReq({ method: method, params: params });
+            if (change) {
+                res.then( hash => {
+                    // in case I want to do something in the future
+                });
+            }
+            return res;
         }
     };
 

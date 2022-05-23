@@ -68,6 +68,10 @@ const cookies = {
 
 // advisor config and methods
 const advisor = {
+    speed: '75',
+    fee: 0.1,
+    maxFee: 0.1,
+
     set: async function(data) {
         const properties = await this.get();
         Object.entries(data).forEach(([k,v]) => properties[k] = v);

@@ -48,8 +48,6 @@ const messageDOM = {
     
         setTimeout(() => this.watch(), 100);
     },
-    
-    
 }
 messageDOM.watch();
 
@@ -94,12 +92,17 @@ const advisor = {
 
     updateDOM: async function(init=false) {
         const advProp = await (init ? this.init() : this.get());
+
+        const message = { event: 'advisor' };
+
         if (advProp.enabled && advProp.apiKey) {
-            messageDOM.send({ event: 'advisor', apiKey: advProp.apiKey });
+            message.apiKey = advProp.apiKey;
         }
         else if (!init) {
-            messageDOM.send({ event: 'advisor', apiKey: false });
+            message.apiKey = false;
         }
+
+        messageDOM.send(message);
     },
 };
 

@@ -369,7 +369,7 @@ const messageBus = {
     // watch from message from contentScript
     watch: async function() {
         chrome.runtime.onMessage.addListener((message, sender, reply) => {
-            console.log(message)
+            // console.log(message)
             
             let replyMsg = 'Message received';
             if (this.events[message.event]) {

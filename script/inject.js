@@ -6,7 +6,7 @@ const messageBus = {
             const checkInt = setInterval( () => {
                 const extMessageContainer = document.querySelector('#' + id);
                 if (extMessageContainer) {
-                    const extMessage = JSON.parse(extMessageContainer.value);
+                    const extMessage = extMessageContainer.value !== 'undefined' ? JSON.parse(extMessageContainer.value) : false;
                     extMessageContainer.remove();
                     clearInterval(checkInt);
                     resolve(extMessage);
@@ -46,36 +46,61 @@ const messageBus = {
         this.writeDomMessage('extension-message-sent', { event: event, message: message });
 
         const response = await this.watchDomMessage('extension-message-sent-reply');
-        reply(response);
+
+        if (reply){
+            reply(response);
+        }
     },
 };
 messageBus.watch();
+
+const network = {
+    list: [
+        { name: 'eth', id: 1 },
+        { name: 'bsc', id: 56 },
+        { name: 'poly', id: 137 },
+        { name: 'ftm', id: 250 },
+        { name: 'avax', id: 43114 },
+        { name: 'cro', id: 25 },
+        { name: 'movr', id: 1285 },
+        { name: 'one', id: 166660000 },
+        { name: 'ht', id: 128 },
+        { name: 'celo', id: 42220 },
+        { name: 'fuse', id: 122 },
+    ],
+
+    get: function() {
+        this.selected = this.list.find(e => e.id == parseInt(window.ethereum.networkVersion));
+
+        return this.selected ? this.selected.name : false;
+    },
+
+    onChange: function(callback) {
+        this.changeCallback = callback;
+    },
+
+    changeWatcher: function() {
+        setInterval(() => {
+            const oldNetwork = this.selected;
+            this.selected = this.get();
+
+            if (oldNetwork != this.selected) {
+                if (this.changeCallback) {
+                    this.changeCallback(this.selected);
+                }
+                // send a message to contentScript so it knows when network changed
+                messageBus.send('network', { network: this.selected });
+            }
+        }, 100);
+    },
+};
+network.changeWatcher();
 
 
 const owlracle = {
     url: 'https://owlracle.info',
     speed: 0,
     args: { accept: "75" },
-
-    getNetwork: function() {
-        const networks = [
-            { name: 'eth', id: 1 },
-            { name: 'bsc', id: 56 },
-            { name: 'poly', id: 137 },
-            { name: 'ftm', id: 250 },
-            { name: 'avax', id: 43114 },
-            { name: 'cro', id: 25 },
-            { name: 'movr', id: 1285 },
-            { name: 'one', id: 166660000 },
-            { name: 'ht', id: 128 },
-            { name: 'celo', id: 42220 },
-            { name: 'fuse', id: 122 },
-        ];
-
-        this.network = networks.find(e => e.id == parseInt(window.ethereum.networkVersion));
-
-        return this.network ? this.network.name : false;
-    },
 
     lastGas: {
         expire: 10000,
@@ -123,14 +148,14 @@ const owlracle = {
             return gasPrice;
         }
 
-        const network = this.getNetwork();
-        if (!network) {
+        const ntw = network.get();
+        if (!ntw) {
             console.log('Network not supported');
             return false;
         }
 
         const args = this.args ? '&' + new URLSearchParams(this.args).toString() : '';
-        const url = `${this.url}/${ network }/gas?apikey=${this.apiKey}${args}`;
+        const url = `${this.url}/${ ntw }/gas?apikey=${this.apiKey}${args}`;
 
         const req = await fetch(url);
         const res = await req.json();
@@ -199,6 +224,11 @@ if (window.ethereum) {
     
         // console.log(owlracle.apiKey);
         return true;
+    });
+
+    // send back network to popup
+    messageBus.addEvent('get-network', () => {
+        return network.get();
     });
 }
 else {

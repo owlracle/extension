@@ -1,3 +1,5 @@
+import advisor from './advisor.min.js';
+
 // set the cookie utils object
 const cookies = {
     set: function (key, value, { expires, path, json } = {}) {
@@ -66,25 +68,6 @@ const cookies = {
     },
 };
 
-// advisor config and methods
-const advisor = {
-    speed: '75',
-    fee: 0.1,
-    maxFee: 0.1,
-
-    set: async function(data) {
-        const properties = await this.get();
-        Object.entries(data).forEach(([k,v]) => properties[k] = v);
-        await chrome.storage.local.set({ advisor: properties });
-        messageBus.send('advisor', properties);
-    },
-
-    // return the storage var, or wait until it is ready
-    get: async function() {
-        const storage = await chrome.storage.local.get();
-        return storage.advisor || await new Promise(resolve => setTimeout(async () => resolve(await this.get()), 100));
-    },
-};
 
 const login = {
     set: function(args) {
@@ -413,4 +396,4 @@ const messageBus = {
 }
 
 
-export { cookies, login, network, imgCache, ModalWindow, Dropdown, menu, messageBus, advisor };
+export { cookies, login, network, imgCache, ModalWindow, Dropdown, menu, messageBus };

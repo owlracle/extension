@@ -18,6 +18,7 @@ const messageBus = {
     // watch for dom for received messages from contentScript
     watch: async function() {
         const message = await this.watchDomMessage('extension-message-received');
+        // console.log(message)
     
         let replyMsg = 'Message received, but no reply given';
         if (message.event && this.events[message.event]) {
@@ -71,8 +72,7 @@ const network = {
 
     get: function() {
         this.selected = this.list.find(e => e.id == parseInt(window.ethereum.networkVersion));
-
-        return this.selected ? this.selected.name : false;
+        return this.selected;
     },
 
     onChange: function(callback) {
@@ -82,7 +82,8 @@ const network = {
     changeWatcher: function() {
         setInterval(() => {
             const oldNetwork = this.selected;
-            this.selected = this.get();
+
+            this.get();
 
             if (oldNetwork != this.selected) {
                 if (this.changeCallback) {
@@ -90,7 +91,7 @@ const network = {
                 }
                 // send a message to contentScript so it knows when network changed
                 if (oldNetwork) {
-                    messageBus.send('network', { network: this.selected });
+                    messageBus.send('network', { network: this.selected.name });
                 }
             }
         }, 100);
@@ -160,7 +161,7 @@ const owlracle = {
         }
 
         this.args.apikey = this.apiKey;
-        const url = `${this.url}/${ ntw }/gas?${ new URLSearchParams(this.args).toString() }`;
+        const url = `${this.url}/${ ntw.name }/gas?${ new URLSearchParams(this.args).toString() }`;
 
         const req = await fetch(url);
         const res = await req.json();
@@ -243,7 +244,7 @@ if (window.ethereum) {
 
     // send back network to popup
     messageBus.addEvent('get-network', () => {
-        return network.get();
+        return network.get().name;
     });
 }
 else {

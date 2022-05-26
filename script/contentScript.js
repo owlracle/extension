@@ -32,6 +32,7 @@ const messageDOM = {
     
     // write dom message and wait for reply
     send: async function(message) {
+        // console.log(message)
         this.writeDomMessage('extension-message-received', message);
         // watch for reply from inject, and send reply back to popup
         return await this.watchDomMessage('extension-message-received-reply');
@@ -43,6 +44,7 @@ const messageDOM = {
     
         // send message to popup and wait for reply to put the reply on dom
         chrome.runtime.sendMessage(message, response => {
+            // console.log(message, response)
             this.writeDomMessage('extension-message-sent-reply', response);
         });
     

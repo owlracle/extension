@@ -113,7 +113,6 @@ const advisor = {
             this.setCost();
             return true;
         });
-
     },
 
     setCost: async function() {

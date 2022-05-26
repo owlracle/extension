@@ -356,7 +356,7 @@ const messageBus = {
     // watch from message from contentScript
     watch: async function() {
         chrome.runtime.onMessage.addListener((message, sender, reply) => {
-            // console.log(message)
+            // console.log(sender)
             
             let replyMsg = 'Message received';
             if (this.events[message.event]) {
@@ -376,6 +376,7 @@ const messageBus = {
 
     // send to contentScript
     send: function(event, message, reply, background=false) {
+        // console.log(event, message)
         if (background) {
             chrome.runtime.sendMessage({ event: event, message: message }, response => {
                 if (reply) {
@@ -387,6 +388,7 @@ const messageBus = {
 
         chrome.tabs.query({active: true, currentWindow: true}, tabs => {
             chrome.tabs.sendMessage(tabs[0].id, { event: event, message: message }, response => {
+                // console.log(response)
                 if (reply) {
                     reply(response);
                 }

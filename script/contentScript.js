@@ -97,8 +97,13 @@ const advisor = {
 
         const message = { event: 'advisor' };
 
-        if (advProp.enabled && advProp.apiKey) {
-            message.apiKey = advProp.apiKey;
+        if (advProp.enabled) {
+            if (advProp.apiKey) {
+                message.apiKey = advProp.apiKey;
+            }
+            if (advProp.speed) {
+                message.speed = advProp.speed;
+            }
         }
         else if (!init) {
             message.apiKey = false;

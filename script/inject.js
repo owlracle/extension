@@ -238,7 +238,9 @@ if (window.ethereum) {
         
         owlracle.apiKey = message.apiKey;
     
-        // console.log(owlracle.apiKey);
+        if (message.speed) {
+            owlracle.args.accept = message.speed;
+        }
         return true;
     });
 

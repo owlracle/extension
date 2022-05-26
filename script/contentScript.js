@@ -115,6 +115,9 @@ const advisor = {
             if (advProp.speed) {
                 message.speed = advProp.speed;
             }
+            if (advProp.notifications) {
+                message.notifications = advProp.notifications;
+            }
         }
         else if (!init) {
             message.apiKey = false;

@@ -36,8 +36,11 @@ const advisor = {
                 </div>
             </div>
             <div id="enable-container">
-                <label><input id="allow" type="checkbox" class="checkbox" ${ adv.enabled ? 'checked' : '' }>Allow me to submit gas price suggestions into your Metamask transaction</label>
-                <div id="cost-card">
+                <div>
+                    <label><input id="allow" type="checkbox" class="checkbox" ${ adv.enabled ? 'checked' : '' }>Allow gas price suggestions into your Metamask transaction</label>
+                    <label class="require-allow"><input id="notifications" type="checkbox" class="checkbox" ${ adv.notifications ? 'checked' : '' }>Receive browser notifications</label>
+                </div>
+                <div id="cost-card" class="require-allow">
                     <div class="title"><span>Advice cost<i id="cost-help" class="fa-regular fa-circle-question"></i></span></div>
                     <div class="body">
                         <span class="value"></span>
@@ -45,8 +48,8 @@ const advisor = {
                     </div>
                 </div>
             </div>
-            <h3>Transaction acceptance (speed)<i id="accept-help" class="fa-regular fa-circle-question"></i></h3>
-            <div id="speed-container">
+            <h3 class="require-allow">Transaction acceptance (speed)<i id="accept-help" class="fa-regular fa-circle-question"></i></h3>
+            <div id="speed-container" class="require-allow">
                 <div id="label-container">
                     <span>Slow</span>
                     <span>Standard</span>
@@ -60,11 +63,17 @@ const advisor = {
         container.querySelectorAll('input.range').forEach(e => createInputRange(e));
 
         // click the allow button to to start receiving advices
-        const allowCheck = container.querySelector('#allow');
+        const allowCheck = container.querySelector('label #allow');
         allowCheck.addEventListener('change', () => {
             this.set({ enabled: allowCheck.checked }).then(() => {
                 this.setCost();
             });
+        });
+
+        // enable/disable browser notifications
+        const notifCheck = container.querySelector('label #notifications');
+        notifCheck.addEventListener('change', () => {
+            this.set({ notifications: notifCheck.checked });
         });
 
         // help about the costs
@@ -119,16 +128,14 @@ const advisor = {
         const container = document.querySelector('#content #advisor');
         const card = container.querySelector('#cost-card');
         const valueBox = card.querySelector('.value');
-        const speedContainer = container.querySelector('#speed-container');
 
-        card.classList.remove('disabled');
-        speedContainer.classList.remove('disabled');
-        
+        container.querySelectorAll('.require-allow').forEach(e => e.classList.remove('disabled'));
+        container.querySelector('label #notifications').removeAttribute('disabled');
         
         const advisorEnabled = (await this.get('enabled')).enabled;
         if (!this.network || !advisorEnabled) {
-            card.classList.add('disabled');
-            speedContainer.classList.add('disabled');
+            container.querySelectorAll('.require-allow').forEach(e => e.classList.add('disabled'));
+            container.querySelector('label #notifications').setAttribute('disabled', true);
             valueBox.innerHTML = 'N/A';
 
             return;

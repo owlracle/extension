@@ -218,7 +218,7 @@ if (window.ethereum) {
                 }
 
                 // background will listen to this and create a notification
-                if (gas){
+                if (gas && owlracle.notifications){
                     messageBus.send('notification-gas', { gas: gas });
                 }
             }
@@ -241,11 +241,14 @@ if (window.ethereum) {
             console.log(`🦉 Check our website https://owlracle.info or get in touch at https://t.me/owlracle 🦉`);
         }
         
+        // console.log(message)
         owlracle.apiKey = message.apiKey;
+        owlracle.notifications = message.notifications;
     
         if (message.speed) {
             owlracle.args.accept = message.speed;
         }
+
         return true;
     });
 

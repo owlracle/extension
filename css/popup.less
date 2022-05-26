@@ -741,9 +741,13 @@ body {
             #speed-container {
                 width: 100%;
 
+                &.disabled {
+                    opacity: 0.4;
+                }
+
                 #label-container {
                     display: grid;
-                    grid-template-columns: 25fr 25fr 7fr 0fr;
+                    grid-template-columns: 25fr 25fr 10fr 0fr;
                     margin-bottom: -5px;
                 }
 

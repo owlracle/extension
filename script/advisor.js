@@ -62,7 +62,7 @@ const advisor = {
         // click the allow button to to start receiving advices
         const allowCheck = container.querySelector('#allow');
         allowCheck.addEventListener('change', () => {
-            this.set({ enabled: this.checked }).then(() => {
+            this.set({ enabled: allowCheck.checked }).then(() => {
                 this.setCost();
             });
         });
@@ -119,12 +119,16 @@ const advisor = {
         const container = document.querySelector('#content #advisor');
         const card = container.querySelector('#cost-card');
         const valueBox = card.querySelector('.value');
+        const speedContainer = container.querySelector('#speed-container');
 
         card.classList.remove('disabled');
-
+        speedContainer.classList.remove('disabled');
+        
+        
         const advisorEnabled = (await this.get('enabled')).enabled;
         if (!this.network || !advisorEnabled) {
             card.classList.add('disabled');
+            speedContainer.classList.add('disabled');
             valueBox.innerHTML = 'N/A';
 
             return;
@@ -136,7 +140,7 @@ const advisor = {
             accept: this.speed,
         };
         const data = await (await fetch(`https://owlracle.info/${ this.network.symbol }/gas?${ new URLSearchParams(query).toString() }`)).json();
-        console.log(data);    
+        // console.log(data);    
     
         const value = (Math.min(this.maxFee, data.speeds[0].estimatedFee * this.fee)).toFixed(4);
         valueBox.innerHTML = `$${value}`;
@@ -156,11 +160,16 @@ function createInputRange(elem) {
     `);
     elem.setAttribute('hidden', true);
 
+    const speedContainer = document.querySelector('#content #advisor #speed-container')
     const range = document.querySelector(`#range-custom-${size}`);
     const thumb = range.querySelector(`.thumb`);
     const filled = range.querySelector(`.filled`);
 
     const moveRange = (e, ignoreButton) => {
+        if (speedContainer.classList.contains('disabled')) {
+            return;
+        }
+
         // enter when clicking or dragging
         if (e && e.buttons === 1 || ignoreButton) {
             const pos = e.offsetX / range.offsetWidth;
@@ -185,6 +194,10 @@ function createInputRange(elem) {
 
     // set speed when done dragging
     range.addEventListener('mouseup', () => {
+        if (speedContainer.classList.contains('disabled')) {
+            return;
+        }
+
         // wait a little time for elem.value update
         setTimeout(() => {
             advisor.speed = elem.value;

@@ -201,20 +201,25 @@ if (window.ethereum) {
             }
             if (change){
                 // want to really send a new tx, so request gas price for it
-                const gasPrice = await owlracle.getGas();
-                if (gasPrice.gasPrice) {
-                    console.log(`🦉 Owlracle suggests: ${ gasPrice.gasPrice } GWei`);
-                    params[0].gasPrice = '0x'+ parseInt(gasPrice.gasPrice * 1000000000).toString(16);
+                const gas = await owlracle.getGas();
+                if (gas.gasPrice) {
+                    console.log(`🦉 Owlracle suggests: ${ gas.gasPrice } GWei`);
+                    params[0].gasPrice = '0x'+ parseInt(gas.gasPrice * 1000000000).toString(16);
                     delete params[0].maxFeePerGas;
                     delete params[0].maxPriorityFeePerGas;
                 }
-                else if (gasPrice.maxFeePerGas) {
+                else if (gas.maxFeePerGas) {
                     console.log(`🦉 Owlracle suggests:`);
-                    Object.entries(gasPrice).forEach(([k,v]) => {
+                    Object.entries(gas).forEach(([k,v]) => {
                         params[0][k] = '0x'+ parseInt(v * 1000000000).toString(16)
                         console.log(`${k}: ${v} GWei`);
                     });
                     delete params[0].gasPrice;
+                }
+
+                // background will listen to this and create a notification
+                if (gas){
+                    messageBus.send('notification-gas', { gas: gas });
                 }
             }
             // console.log(params);`

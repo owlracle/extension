@@ -21,7 +21,8 @@
     "permissions": [
         "cookies",
         "activeTab",
-        "storage"
+        "storage",
+        "notifications"
     ],
     "content_scripts": [{
         "matches": [ "*://*/*" ],
@@ -33,5 +34,8 @@
             "script/inject.min.js"
         ],
         "matches": [ "*://*/*" ]
-    }]
+    }],
+    "background": {
+        "service_worker": "script/background.js"
+    }
 }

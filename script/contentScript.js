@@ -7,6 +7,8 @@ script.onload = () => script.remove();
 // console.log('contentScript loaded');
 
 const messageDOM = {
+    events: {},
+
     watchDomMessage: async function(id) {
         return new Promise(resolve => {
             const checkInt = setInterval( () => {
@@ -37,16 +39,25 @@ const messageDOM = {
         // watch for reply from inject, and send reply back to popup
         return await this.watchDomMessage('extension-message-received-reply');
     },
+
+    addEvent: function(name, callback) {
+        this.events[name] = callback;
+    },
     
     watch: async function() {
         // watch for messages sent from inject, so send them to popup
         const message = await this.watchDomMessage('extension-message-sent');
-    
-        // send message to popup and wait for reply to put the reply on dom
-        chrome.runtime.sendMessage(message, response => {
-            // console.log(message, response)
-            this.writeDomMessage('extension-message-sent-reply', response);
-        });
+        
+        if (Object.keys(this.events).includes(message.event)) {
+            this.events[message.event](message.message);
+        }
+        else {
+            // send message to popup and wait for reply to put the reply on dom
+            chrome.runtime.sendMessage(message, response => {
+                // console.log(message, response)
+                this.writeDomMessage('extension-message-sent-reply', response);
+            });
+        }
     
         setTimeout(() => this.watch(), 100);
     },

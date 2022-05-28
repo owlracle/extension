@@ -1,7 +1,7 @@
 {
     "name": "Owlracle Gas Price Tracker",
     "description": "Simple and accurate Multichain gas price tracker",
-    "version": "1.1.1",
+    "version": "1.2",
     "manifest_version": 3,
     "action": {
         "default_popup": "popup.html",
@@ -36,6 +36,6 @@
         "matches": [ "*://*/*" ]
     }],
     "background": {
-        "service_worker": "script/background.js"
+        "service_worker": "script/background.min.js"
     }
 }

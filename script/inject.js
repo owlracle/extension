@@ -239,7 +239,7 @@ if (window.ethereum) {
     messageBus.addEvent('advisor', message => {
         if (!owlracle.apiKey && message.apiKey) {
             console.log(`🦉 You are taking Owlracle's advice for gas price settings on your Metamask transactions 🦉`);
-            console.log(`🦉 Check our website https://owlracle.info or get in touch at https://t.me/owlracle 🦉`);
+            console.log(`🦉 Check our website https://owlracle.info or get in touch at https://discord.gg/zYS4f8eRbC 🦉`);
         }
         
         // console.log(message)

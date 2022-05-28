@@ -188,6 +188,12 @@ body {
         }
     }
 
+    a {
+        text-decoration: none;
+        color: #3b8bc0;
+        cursor: pointer;
+    }
+
     #gas.item {
         flex-direction: column;
         align-items: center;
@@ -547,10 +553,7 @@ body {
                 }
 
                 a {
-                    text-decoration: none;
                     font-size: 1.1rem;
-                    color: #3b8bc0;
-                    cursor: pointer;
                 }
             }
 
@@ -627,6 +630,29 @@ body {
     }
 
     #advisor.item {
+        h2 {
+            display: flex;
+            align-items: flex-end;
+
+            .beta {
+                font-family: monospace;
+                text-transform: uppercase;
+                border-radius: 3px;
+                background-color: var(--bg-intense-color);
+                padding: 2px 10px;
+                color: #8f4646;
+                font-size: .9rem;
+                margin-bottom: 10px;
+                margin-left: 10px;
+            }
+        }
+
+        a {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
         #content {
             padding: 5px 15px;
 

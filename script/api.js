@@ -3,6 +3,7 @@ import { login, ModalWindow, menu, serverURL } from './utils.min.js';
 const api = {
     footer: `
         <a class="item" href="https://github.com/owlracle" target="_blank"><i class="fa-brands fa-github"></i></a>
+        <a class="item" href="https://discord.gg/zYS4f8eRbC" target="_blank"><i class="fa-brands fa-discord"></i></a>
         <a class="item" href="https://t.me/owlracle" target="_blank"><i class="fa-brands fa-telegram"></i></a>
         <a class="item" href="https://twitter.com/owlracleapi" target="_blank"><i class="fa-brands fa-twitter"></i></a>
         <a class="item" href="https://facebook.com/owlracle" target="_blank"><i class="fa-brands fa-facebook"></i></a>

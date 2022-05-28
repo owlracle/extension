@@ -27,7 +27,7 @@ const advisor = {
 
         const container = document.querySelector('#content #advisor');
         container.innerHTML = `<div id="content" class="logged">
-            <h2>Tx advisor</h2>
+            <h2>Tx advisor <span class="beta">beta</span></h2>
             <div id="metamask-connected">
                 <img src="img/metamask-fox.svg" id="metamask-icon">
                 <div id="network-container">
@@ -58,6 +58,7 @@ const advisor = {
                 </div>
                 <input type="range" min="35" max="100" step="5" value="${ this.speed }" class="range">
             </div>
+            <a href="https://discord.gg/yj4n3pk9Nq" target="_blank">Found a bug? Please report.</a>
         </div>`;
 
         container.querySelectorAll('input.range').forEach(e => createInputRange(e));

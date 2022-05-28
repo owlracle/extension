@@ -1,4 +1,4 @@
-import { login, ModalWindow, menu } from './utils.min.js';
+import { login, ModalWindow, menu, serverURL } from './utils.min.js';
 
 const api = {
     footer: `
@@ -81,7 +81,7 @@ const api = {
             container.classList.add('loading');
         }
 
-        const data = await (await fetch(`https://owlracle.info/keys/${apiKey}`)).json();
+        const data = await (await fetch(`${ serverURL }/keys/${ apiKey }`)).json();
         if (data.error){
             new ModalWindow({
                 title: 'Session expired',
@@ -113,7 +113,7 @@ const api = {
                     <input class="input" value="${data.usage.apiKeyTotal}" readonly>
                 </div>
                 <button id="logout"><i class="fa-solid fa-right-from-bracket"></i>LOGOUT</button>
-                <a href="https://owlracle.info/?action=keys&apikey=${data.apiKey}" target="_blank">Visit owlracle.info for more information</a>
+                <a href="${ serverURL }/?action=keys&apikey=${data.apiKey}" target="_blank">Visit owlracle.info for more information</a>
             </div>
             <div id="footer" class="logged">${this.footer}</div>
         `;
@@ -173,7 +173,7 @@ const api = {
 
             const text = button.innerHTML;
             button.innerHTML = '<i class="fas fa-spin fa-cog"></i>';
-            const data = await (await fetch(`https://owlracle.info/keys/${input.value.toLowerCase()}`)).json();
+            const data = await (await fetch(`${ serverURL }/keys/${input.value.toLowerCase()}`)).json();
             button.innerHTML = text;
             if (data.error && data.status == 401){
                 this.showTip('Could not find your api key');
@@ -228,7 +228,7 @@ const api = {
     },
 
     newApiKey: function() {
-        window.open('https://owlracle.info/?action=newkey');
+        window.open(`${ serverURL }/?action=newkey`);
     }
 }
 

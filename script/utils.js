@@ -1,5 +1,8 @@
 import advisor from './advisor.min.js';
 
+const serverURL = "https://owlracle.info";
+// const serverURL = "ngrok dev url";
+
 // set the cookie utils object
 const cookies = {
     set: function (key, value, { expires, path, json } = {}) {
@@ -398,4 +401,4 @@ const messageBus = {
 }
 
 
-export { cookies, login, network, imgCache, ModalWindow, Dropdown, menu, messageBus };
+export { cookies, login, network, imgCache, ModalWindow, Dropdown, menu, messageBus, serverURL };

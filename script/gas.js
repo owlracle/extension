@@ -1,4 +1,4 @@
-import { network, ModalWindow, login, menu } from './utils.min.js';
+import { network, ModalWindow, login, menu, serverURL } from './utils.min.js';
 
 const gasTimer = {
     cards: [ // preferences for cards
@@ -44,7 +44,7 @@ const gasTimer = {
         }
 
         query = new URLSearchParams(query).toString();
-        const data = await (await fetch(`https://owlracle.info/${network.get().symbol}/gas?${query}`)).json();
+        const data = await (await fetch(`${ serverURL }/${ network.get().symbol }/gas?${ query }`)).json();
 
         if (data.error && data.status == 403) {
             console.log(data);

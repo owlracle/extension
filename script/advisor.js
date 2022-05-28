@@ -1,4 +1,4 @@
-import { login, network, messageBus, ModalWindow } from './utils.min.js';
+import { login, network, messageBus, ModalWindow, serverURL } from './utils.min.js';
 
 // advisor config and methods
 const advisor = {
@@ -117,7 +117,7 @@ const advisor = {
             }
 
             const ntw = network.get(message);
-            container.querySelector('#network-container #network').innerHTML = `<img src="https://owlracle.info/img/${ntw.symbol}.png"><span>${ntw.name}</span>`;
+            container.querySelector('#network-container #network').innerHTML = `<img src="https://owlracle.info/img/${ ntw.symbol }.png"><span>${ ntw.name }</span>`;
             this.network = ntw;
             this.setCost();
             return true;
@@ -146,7 +146,7 @@ const advisor = {
             apikey: login.get().apikey,
             accept: this.speed,
         };
-        const data = await (await fetch(`https://owlracle.info/${ this.network.symbol }/gas?${ new URLSearchParams(query).toString() }`)).json();
+        const data = await (await fetch(`${ serverURL }/${ this.network.symbol }/gas?${ new URLSearchParams(query).toString() }`)).json();
         // console.log(data);    
     
         const value = (Math.min(this.maxFee, data.speeds[0].estimatedFee * this.fee)).toFixed(4);

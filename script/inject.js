@@ -102,6 +102,7 @@ network.changeWatcher();
 
 const owlracle = {
     url: 'https://owlracle.info',
+    // url: 'ngrok dev url',
     speed: 0,
     args: {
         accept: '75',

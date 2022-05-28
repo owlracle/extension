@@ -1,4 +1,4 @@
-import { network, cookies, login, imgCache, Dropdown, ModalWindow, menu } from './utils.min.js';
+import { network, cookies, login, imgCache, Dropdown, ModalWindow, menu, serverURL } from './utils.min.js';
 
 // create price chart
 export default {
@@ -377,7 +377,7 @@ export default {
         }
 
         query = new URLSearchParams(query).toString();
-        this.history = await (await fetch(`https://owlracle.info/${this.network}/history?${query}`)).json();
+        this.history = await (await fetch(`${ serverURL }/${this.network}/history?${query}`)).json();
         // console.log(this.history)
         if (this.history.error) {
             new ModalWindow({

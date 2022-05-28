@@ -742,6 +742,16 @@ body {
             #speed-container {
                 width: 100%;
 
+                &.disabled .range-custom {
+                    .filled {
+                        display: none;
+                    }
+
+                    .thumb {
+                        color: transparent;
+                    }
+                }    
+
                 #label-container {
                     display: grid;
                     grid-template-columns: 25fr 25fr 10fr 0fr;

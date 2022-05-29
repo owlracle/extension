@@ -63,11 +63,6 @@ That is it! I hope you enjoyed our extension and this brief tutorial.
     </a>
 </span>
 <span>
-    <a href="https://facebook.com/owlracle">
-    <img src="https://img.shields.io/badge/Facebook-1877F2?style=for-the-badge&logo=facebook&logoColor=white">
-    </a>
-</span>
-<span>
     <a href="https://t.me/owlracle">
     <img src="https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white">
     </a>

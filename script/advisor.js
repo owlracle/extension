@@ -20,12 +20,21 @@ const advisor = {
     },
 
     init: async function() {
+        const container = document.querySelector('#content #advisor');
+
+        if (!login.get('apikey')) {
+            container.innerHTML = `<div id="content" class="logged">
+                <h2>Tx advisor <span class="beta">beta</span></h2>
+                <p>You need to login to be able to use this feature</p>
+            `;
+            return;
+        }
+
         const adv = await this.get();
         if (adv.speed) {
             this.speed = adv.speed;
         }
 
-        const container = document.querySelector('#content #advisor');
         container.innerHTML = `<div id="content" class="logged">
             <h2>Tx advisor <span class="beta">beta</span></h2>
             <div id="metamask-connected">

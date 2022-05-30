@@ -86,6 +86,7 @@ const login = {
 
         if (login.apikey) {
             advisor.set({ apiKey: login.apikey });
+            menu.enable('advisor');
         }
     },
 
@@ -129,6 +130,7 @@ const login = {
 
         if (fields.includes('apikey')) {
             advisor.set({ apiKey: false });
+            menu.disable('advisor');
         }
     }
 }
@@ -316,6 +318,10 @@ const menu = {
 
     // change dom css
     setActive: function(active) {
+        if (this.isDisabled(active)){
+            return;
+        }
+
         this.active = active;
 
         document.querySelectorAll('#menu .item, #content .item').forEach(e => {
@@ -334,7 +340,11 @@ const menu = {
     },
 
     setClick: function(active, fn) {
-        document.querySelector(`#menu #${active}.item`).addEventListener('click', () => fn());
+        document.querySelector(`#menu #${active}.item`).addEventListener('click', () => {
+            if (!this.isDisabled(active)){
+                fn();
+            }
+        });
     },
 
     click: function(active) {
@@ -349,6 +359,18 @@ const menu = {
     show: function() {
         document.querySelectorAll('#header, #menu').forEach(e => e.classList.remove('hidden'));
         return this;
+    },
+
+    disable: function(active) {
+        document.querySelector(`#menu #${active}.item`).classList.add('disabled');
+    },
+
+    isDisabled: function(active) {
+        return document.querySelector(`#menu #${active}.item`).classList.contains('disabled');
+    },
+
+    enable: function(active) {
+        document.querySelector(`#menu #${active}.item`).classList.remove('disabled');
     },
 }
 

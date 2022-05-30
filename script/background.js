@@ -1,3 +1,8 @@
+// set advisor storage when extension installed
+chrome.runtime.onInstalled.addListener( () => {
+    chrome.storage.local.set({ advisor: { enabled: false } });
+});
+
 chrome.runtime.onMessage.addListener((message, sender, reply) => {
     // console.log(message)
     // received a message from contentScript to send notification

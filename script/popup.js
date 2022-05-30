@@ -56,6 +56,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // function for gas menu button
     menu.setClick('gas', () => networkSwitcher.reload());
     menu.setClick('chart', () => networkSwitcher.reload());
+    menu.setClick('advisor', () => advisor.init());
     menu.setClick('key', () => api.check());
 
     // check if user is logged with an api key
@@ -63,6 +64,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // refresh cookies
     if (login.get('apikey')){
         login.refresh();
+    }
+    else {
+        menu.disable('advisor');
     }
 
     let menuOpt = null;

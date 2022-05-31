@@ -102,7 +102,7 @@ network.changeWatcher();
 
 const owlracle = {
     url: 'https://owlracle.info',
-    // url: 'ngrok dev url',
+    // url: 'https://738e-179-152-6-27.ngrok.io',
     speed: 0,
     args: {
         accept: '75',
@@ -167,6 +167,10 @@ const owlracle = {
         const req = await fetch(url);
         const res = await req.json();
 
+        if (res.error) {
+            return res;
+        }
+
         const speedInfo = res.speeds[this.speed];
         if (speedInfo && speedInfo.gasPrice) {
             if (res.baseFee) {
@@ -203,7 +207,13 @@ if (window.ethereum) {
             if (change){
                 // want to really send a new tx, so request gas price for it
                 const gas = await owlracle.getGas();
-                if (gas.gasPrice) {
+                // console.log(gas);
+
+                if (gas.error) {
+                    console.log(`🦉 Owlracle encountered en error:`);
+                    console.log(gas);
+                }
+                else if (gas.gasPrice) {
                     console.log(`🦉 Owlracle suggests: ${ gas.gasPrice } GWei`);
                     params[0].gasPrice = '0x'+ parseInt(gas.gasPrice * 1000000000).toString(16);
                     delete params[0].maxFeePerGas;

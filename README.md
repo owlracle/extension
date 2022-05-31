@@ -39,15 +39,19 @@ version = 2
 
 You can change the desired network on the button in the header, just like on our website.
 
-<p align="center"><img src="https://user-images.githubusercontent.com/19828711/149077792-f04c03e1-2269-4f70-8e68-5777244c5318.png"></p>
+<p align="center"><img src="https://user-images.githubusercontent.com/19828711/171278345-f3832e49-28b3-4f37-beb7-8d9bb61a81a3.png"></p>
 
 * The second tab is for gas price history. Just like on our website, you can change the timeframe (_10m_, _30m_, _1h_, _2h_, _4h_, _1d_), the chart style (_area_ or _candlesticks_) and the information you want to track (_gas price_, _token price_, _estimated gas fee_).
 
-<p align="center"><img src="https://user-images.githubusercontent.com/19828711/149077901-4dfd71c1-0456-46fa-abd9-549c3d14aa0e.png"></p>
+<p align="center"><img src="https://user-images.githubusercontent.com/19828711/171278819-9e9020cd-eec3-4c65-99c4-1177fb37cdab.png"></p>
 
-* The third tab shows information about your API key, or a message asking for you to log in with your key if you still haven't. In this tab, you can see your _API credit_, _last hour API usage_, and _total API usage_, as well as a convenient link to our social media profiles.
+* The third tab allows you to receive Owlracle's gas price recommendation right into your Metamask. If you check the option, any time you interact with a smart contract on a website, the transaction will have a custom gas price set by Owlracle API. Using this feature will cost your API **10%** of the estimated tx fee cost, but will never be higher than **$0.1**. 
 
-<p align="center"><img src="https://user-images.githubusercontent.com/19828711/149078337-98dee7a0-c1bf-41c7-a4f7-9a281295cb4e.png"></p>
+<p align="center"><img src="https://user-images.githubusercontent.com/19828711/171279196-96df6df5-4e4b-4345-9a05-ad01f38d6b1d.png"></p>
+
+* The fourth tab shows information about your API key, or a message asking for you to log in with your key if you still haven't. In this tab, you can see your _API credit_, _last hour API usage_, and _total API usage_, as well as a convenient link to our social media profiles.
+
+<p align="center"><img src="https://user-images.githubusercontent.com/19828711/171279031-e0dbc3b0-4b13-45ad-8a95-0ac15ec3e3ea.png"></p>
 
 That is it! I hope you enjoyed our extension and this brief tutorial.
 
@@ -64,12 +68,17 @@ That is it! I hope you enjoyed our extension and this brief tutorial.
 </span>
 <span>
     <a href="https://t.me/owlracle">
-    <img src="https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white">
+    <img src="https://img.shields.io/badge/discord-1DA1F2?style=for-the-badge&logo=discord&logoColor=white">
+    </a>
+</span>
+<span>
+    <a href="https://t.me/owlracle">
+    <img src="https://img.shields.io/badge/Telegram-1DA1F2?style=for-the-badge&logo=telegram&logoColor=white">
     </a>
 </span>
 <span>
     <a href="https://github.com/owlracle">
-    <img src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white">
+    <img src="https://img.shields.io/badge/GitHub-1DA1F2?style=for-the-badge&logo=github&logoColor=white">
     </a>
 </span>
 

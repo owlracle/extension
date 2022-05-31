@@ -10,19 +10,25 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
         const gas = message.message.gas;
 
         let msgBody = '';
-        if (gas.gasPrice) {
+        if (gas.error) {
+            msgBody = gas.message;
+            title = gas.error;
+        }
+        else if (gas.gasPrice) {
             gas.gasPrice = gas.gasPrice == parseInt(gas.gasPrice) ? gas.gasPrice : gas.gasPrice.toFixed(2);
             msgBody = `${ gas.gasPrice } GWei`;
+            title = 'Owlracle suggests:';
         }
         else if (gas.maxFeePerGas) {
             msgBody += `Max Fee: ${ gas.maxFeePerGas.toFixed(2) } GWei\n`;
             msgBody += `Priority Fee: ${ gas.maxPriorityFeePerGas.toFixed(2) } GWei\n`;
+            title = 'Owlracle suggests:';
         }
 
         chrome.notifications.create('', {
             type: 'basic',
             iconUrl: '../img/icon-128.png',
-            title: 'Owlracle suggests:',
+            title: title,
             message: msgBody,
         });    
     }

@@ -62,12 +62,12 @@ That is it! I hope you enjoyed our extension and this brief tutorial.
 ## Contact us:
 
 <span>
-    <a href="https://twitter.com/owlracleAPI">
+    <a href="https://twitter.com/owlracleapi">
     <img src="https://img.shields.io/badge/Twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white">
     </a>
 </span>
 <span>
-    <a href="https://t.me/owlracle">
+    <a href="https://discord.gg/zYS4f8eRbC">
     <img src="https://img.shields.io/badge/discord-1DA1F2?style=for-the-badge&logo=discord&logoColor=white">
     </a>
 </span>

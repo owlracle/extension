@@ -100,6 +100,8 @@ const advisor = {
                     </ul>
 
                     <p>In most cases, the advisor saves you more than it costs. On the rare occasions it doesn't, it will prevent your transaction from being stuck in a congested network.</p>
+
+                    <p class="free">For a limited time, all advice requests are FREE!</p>
                 `,
             });
         });
@@ -159,8 +161,9 @@ const advisor = {
         const data = await (await fetch(`${ serverURL }/${ this.network.symbol }/gas?${ new URLSearchParams(query).toString() }`)).json();
         // console.log(data);    
     
-        const value = (Math.min(this.maxFee, data.speeds[0].estimatedFee * this.fee)).toFixed(4);
-        valueBox.innerHTML = `$${value}`;
+        // const value = (Math.min(this.maxFee, data.speeds[0].estimatedFee * this.fee)).toFixed(4);
+        // valueBox.innerHTML = `$${value}`;
+        valueBox.innerHTML = `<span class="free">FREE</span>`;
     }
 };
 

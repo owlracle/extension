@@ -14,19 +14,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         element: document.querySelector('#network-btn'),
         bound: false,
     
-        reload: function() {
+        reload: async function() {
             if (!this.bound){
                 this.bound = true;
                 this.bindClick();
                 this.element.classList.remove('hidden');
             }
     
-            document.querySelector('#header #link').href = `https://owlracle.info/${network.get().symbol}`;
+            const ntw = await network.get();
+            document.querySelector('#header #link').href = `https://owlracle.info/${ ntw.symbol }`;
     
             this.element.removeAttribute('class');
-            this.element.classList.add(network.get().symbol);
-            this.element.querySelector('img').src = `https://owlracle.info/img/${network.get().symbol}.png`;
-            this.element.querySelector('span').innerHTML = network.get().name;
+            this.element.classList.add(ntw.symbol);
+            this.element.querySelector('img').src = `https://owlracle.info/img/${ ntw.symbol }.png`;
+            this.element.querySelector('span').innerHTML = ntw.name;
     
             if (menu.getActive() == 'gas'){
                 gasTimer.update();
@@ -62,7 +63,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // check if user is logged with an api key
 
     // refresh cookies
-    if (login.get('apikey')){
+    if (await login.get('apikey')){
         login.refresh();
     }
     else {
@@ -70,7 +71,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     let menuOpt = null;
-    if (!login.get('logged')){
+    if (!(await login.get('logged'))){
         menuOpt = 'key';
     }
     
@@ -79,7 +80,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     messageBus.watch();
 
     // listen to network switching
-    messageBus.addEvent('network', message => {
+    messageBus.addEvent('network', async message => {
         // console.log(message);
         if (!message.message.network) {
             document.querySelector('#content #advisor #network-container #network').innerHTML = `<b class="red">Unsupported network</b>`;
@@ -88,7 +89,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return false;
         }
 
-        const ntw = network.get(message.message.network);
+        const ntw = await network.get(message.message.network);
         document.querySelector('#content #advisor #network-container #network').innerHTML = `<img src="https://owlracle.info/img/${ntw.symbol}.png"><span>${ntw.name}</span>`;
         advisor.network = ntw;
         advisor.setCost();

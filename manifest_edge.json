@@ -19,7 +19,6 @@
         "128": "img/icon-128.png"
     },
     "permissions": [
-        "cookies",
         "activeTab",
         "storage",
         "notifications"

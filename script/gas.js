@@ -33,18 +33,22 @@ const gasTimer = {
             accept: this.cards.map(e => e.accept).join(','),
             source: 'extension'
         };
-        if (login.get('apikey')) {
-            query.apikey = login.get('apikey');
+
+        const ak = await login.get('apikey');
+        if (ak) {
+            query.apikey = ak;
         }
+
         if (this.blocks) {
             query.blocks = this.blocks;
         }
+
         if (this.percentile) {
             query.percentile = this.percentile;
         }
 
         query = new URLSearchParams(query).toString();
-        const data = await (await fetch(`${ serverURL }/${ network.get().symbol }/gas?${ query }`)).json();
+        const data = await (await fetch(`${ serverURL }/${ (await network.get()).symbol }/gas?${ query }`)).json();
 
         if (data.error && data.status == 403) {
             console.log(data);

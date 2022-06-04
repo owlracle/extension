@@ -4,85 +4,109 @@ const serverURL = 'https://owlracle.info';
 // const serverURL = 'https://738e-179-152-6-27.ngrok.io';
 
 // set the cookie utils object
-const cookies = {
-    set: function (key, value, { expires, path, json } = {}) {
-        let expTime = 0;
-        if (expires) {
-            if (typeof expires === "object") {
-                expTime += (expires.seconds * 1000) || 0;
-                expTime += (expires.minutes * 1000 * 60) || 0;
-                expTime += (expires.hours * 1000 * 60 * 60) || 0;
-                expTime += (expires.days * 1000 * 60 * 60 * 24) || 0;
-            }
-            else {
-                expTime = expires;
-            }
-
-            const now = new Date();
-            expTime = now.setTime(now.getTime() + expTime);    
-        }
-        if (!path) {
-            path = '/';
-        }
-        if (json){
-            value = JSON.stringify(value);
-        }
-
-        expTime = expTime > 0 ? `;expires=${new Date(expTime).toUTCString()}` : '';
-        const cookieString = `${key}=${value}${expTime};path=${path}`;
-        document.cookie = cookieString;
-        return cookieString;
+const storage = {
+    set: async function(key, value) {
+        const settings = {};
+        settings[key] = value;
+        await chrome.storage.local.set(settings); 
     },
 
-    get: function (key, json) {
-        const cookies = document.cookie.split(';').map(e => e.trim());
-        const match = cookies.filter(e => e.split('=')[0] == key);
-        let value = match.length ? match[0].split('=')[1] : false;
-
-        if (value && json){
-            value = JSON.parse(value);
+    get: async function (key) {
+        const obj = await chrome.storage.local.get(key);
+        if (!Object.keys(obj).length) {
+            return false;
         }
 
-        return value;
+        return obj[key];
     },
 
-    delete: function (key) {
-        const cookies = document.cookie.split(';').map(e => e.trim());
-        const match = cookies.filter(e => e.split('=')[0] == key);
-
-        document.cookie = `${key}=0;expires=${new Date().toUTCString()}`;
-        return match.length > 0;
-    },
-
-    refresh: function (key, { expires, path } = {}) {
-        if (this.get(key)){
-            const optArgs = { path: '/' };
-
-            if (expires) {
-                optArgs.expires = expires;
-            }
-            if (path) {
-                optArgs.path = path;
-            }
-
-            return this.set(key, this.get(key), optArgs);
+    delete: async function(key) {
+        if (!(await this.get(key))) {
+            return false;
         }
-        return false;
+
+        await chrome.storage.local.remove(key);
+        return true;
     },
 };
 
+// NOT USED ANYMORE, maybe will use in the future
+// set the cookie utils object
+// const cookies = {
+//     set: function (key, value, { expires, path, json } = {}) {
+//         let expTime = 0;
+//         if (expires) {
+//             if (typeof expires === "object") {
+//                 expTime += (expires.seconds * 1000) || 0;
+//                 expTime += (expires.minutes * 1000 * 60) || 0;
+//                 expTime += (expires.hours * 1000 * 60 * 60) || 0;
+//                 expTime += (expires.days * 1000 * 60 * 60 * 24) || 0;
+//             }
+//             else {
+//                 expTime = expires;
+//             }
+
+//             const now = new Date();
+//             expTime = now.setTime(now.getTime() + expTime);    
+//         }
+//         if (!path) {
+//             path = '/';
+//         }
+//         if (json){
+//             value = JSON.stringify(value);
+//         }
+
+//         expTime = expTime > 0 ? `;expires=${new Date(expTime).toUTCString()}` : '';
+//         const cookieString = `${key}=${value}${expTime};path=${path}`;
+//         document.cookie = cookieString;
+//         return cookieString;
+//     },
+
+//     get: function (key, json) {
+//         const cookies = document.cookie.split(';').map(e => e.trim());
+//         const match = cookies.filter(e => e.split('=')[0] == key);
+//         let value = match.length ? match[0].split('=')[1] : false;
+
+//         if (value && json){
+//             value = JSON.parse(value);
+//         }
+
+//         return value;
+//     },
+
+//     delete: function (key) {
+//         const cookies = document.cookie.split(';').map(e => e.trim());
+//         const match = cookies.filter(e => e.split('=')[0] == key);
+
+//         document.cookie = `${key}=0;expires=${new Date().toUTCString()}`;
+//         return match.length > 0;
+//     },
+
+//     refresh: function (key, { expires, path } = {}) {
+//         if (this.get(key)){
+//             const optArgs = { path: '/' };
+
+//             if (expires) {
+//                 optArgs.expires = expires;
+//             }
+//             if (path) {
+//                 optArgs.path = path;
+//             }
+
+//             return this.set(key, this.get(key), optArgs);
+//         }
+//         return false;
+//     },
+// };
+
 
 const login = {
-    set: function(args) {
-        const login = cookies.get('login', true) || {};
+    set: async function(args) {
+        const login = (await storage.get('login')) || {};
 
         Object.entries(args).forEach(([k,v]) => login[k] = v);
 
-        const opt = { json: true };
-        if (login.persist){
-            opt.expires = { days: 365 };
-        }
-        cookies.set('login', login, opt);
+        storage.set('login', login);
 
         if (login.apikey) {
             advisor.set({ apiKey: login.apikey });
@@ -94,8 +118,8 @@ const login = {
         this.set({});
     },
 
-    get: function(field){
-        const login = cookies.get('login', true);
+    get: async function(field){
+        const login = await storage.get('login');
 
         if (!login){
             return false;
@@ -109,12 +133,12 @@ const login = {
         return login[field];
     },
 
-    delete: function(fields){
+    delete: async function(fields){
         if (!Array.isArray(fields)){
             fields = [fields];
         }
 
-        const login = cookies.get('login', true);
+        const login = await storage.get('login', true);
 
         fields.forEach(f => {
             if (login && login[f]){
@@ -122,11 +146,7 @@ const login = {
             }
         });
 
-        const opt = { json: true };
-        if (login.persist){
-            opt.expires = { days: 365 };
-        }
-        cookies.set('login', login, opt);
+        storage.set('login', login);
 
         if (fields.includes('apikey')) {
             advisor.set({ apiKey: false });
@@ -174,16 +194,16 @@ const network = {
         } },
     },
 
-    get: function (name) {
+    get: async function (name) {
         if (!name) {
-            name = cookies.get('network') || 'eth';
+            name = (await storage.get('network')) || 'eth';
         }
 
         return this.list[name];
     },
 
     set: function (name) {
-        cookies.set('network', name);
+        storage.set('network', name);
     },
 
     getList: function () {
@@ -301,17 +321,18 @@ const menu = {
     active: 'gas',
 
     // set function for switching between menu buttons
-    init: function() {
+    init: async function() {
         document.querySelectorAll('#menu .item').forEach(e => e.addEventListener('click', () => this.setActive(e.id)));
 
         // try to load menu cookie
-        if (cookies.get('menu')){
+        const menuCk = await storage.get('menu');
+        if (menuCk){
             try {
-                this.active = cookies.get('menu');
+                this.active = menuCk;
             }
             catch (error){
                 console.log(error);
-                cookies.delete('menu');
+                storage.delete('menu');
             }
         }
     },
@@ -332,7 +353,7 @@ const menu = {
         document.querySelector(`#menu #${active}.item`).classList.add('active');
 
         // set cookie
-        cookies.set('menu', this.active);
+        storage.set('menu', this.active);
     },
 
     getActive: function() {
@@ -423,4 +444,4 @@ const messageBus = {
 }
 
 
-export { cookies, login, network, imgCache, ModalWindow, Dropdown, menu, messageBus, serverURL };
+export { storage, login, network, imgCache, ModalWindow, Dropdown, menu, messageBus, serverURL };

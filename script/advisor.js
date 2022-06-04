@@ -22,7 +22,7 @@ const advisor = {
     init: async function() {
         const container = document.querySelector('#content #advisor');
 
-        if (!login.get('apikey')) {
+        if (!(await login.get('apikey'))) {
             container.innerHTML = `<div id="content" class="logged">
                 <h2>Tx advisor <span class="beta">beta</span></h2>
                 <p>You need to login to be able to use this feature</p>
@@ -119,7 +119,7 @@ const advisor = {
         });
 
         // request network to inject (when popup open)
-        messageBus.send('get-network', {} , message => {
+        messageBus.send('get-network', {} , async message => {
             // console.log(message)
             if (!message) {
                 container.querySelector('#network-container #network').innerHTML = `<b class="red">Unsupported network</b>`;
@@ -128,7 +128,11 @@ const advisor = {
                 return false;
             }
 
-            const ntw = network.get(message);
+            const ntw = await network.get(message);
+            if (!ntw) {
+                return false;
+            }
+
             container.querySelector('#network-container #network').innerHTML = `<img src="https://owlracle.info/img/${ ntw.symbol }.png"><span>${ ntw.name }</span>`;
             this.network = ntw;
             this.setCost();
@@ -155,7 +159,7 @@ const advisor = {
 
         const query = {
             source: 'extension',
-            apikey: login.get().apikey,
+            apikey: (await login.get()).apikey,
             accept: this.speed,
         };
         const data = await (await fetch(`${ serverURL }/${ this.network.symbol }/gas?${ new URLSearchParams(query).toString() }`)).json();

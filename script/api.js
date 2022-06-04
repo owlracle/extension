@@ -9,8 +9,8 @@ const api = {
         <a class="item" href="https://medium.com/@owlracleapi" target="_blank"><i class="fa-brands fa-medium"></i></a>
     `,
 
-    check: function() {
-        const lg = login.get('logged');
+    check: async function() {
+        const lg = await login.get('logged');
         if (!lg){
             this.showWelcome();
             return false;
@@ -66,7 +66,7 @@ const api = {
 
     // info page, when user is logged as guest
     showInfo: async function() {
-        const apiKey = login.get('apikey');
+        const apiKey = await login.get('apikey');
 
         if (!apiKey) {
             this.showGuestInfo();
@@ -124,15 +124,14 @@ const api = {
         })
     },
 
-    showGuestInfo: function() {
-        const logged = login.get('logged');
+    showGuestInfo: async function() {
+        const logged = await login.get('logged');
 
         const container = document.querySelector('#content #key');
         container.innerHTML = `<div id="content" class="logged">
             <span>${ logged ? `Log in with an api key to increase your request limit` : `Log in using your api key` }</span>
             <input class="input" placeholder="YOUR_API_KEY">
             <span id="tip"></span>
-            <label><input type="checkbox" class="checkbox">Remember api key</label>
             <button id="login"><i class="fa-solid fa-right-to-bracket"></i>LOG IN</button>
             ${ logged ? `
                 <span class="small">or</span>
@@ -143,7 +142,6 @@ const api = {
         </div>`;
         
         const input = container.querySelector('.input');
-        const checkbox = container.querySelector('.checkbox');
         const button = container.querySelector('#login');
         const linkNew = container.querySelector('a');
         const regex = new RegExp(/^[a-f0-9]{32}$/);
@@ -186,12 +184,6 @@ const api = {
                 apikey: data.apiKey
             };
 
-            if (checkbox.checked){
-                opt.persist = true;
-            }
-            else if (login.get('persist')) {
-                login.delete('persist');
-            }
             login.set(opt);
 
             menu.show().click('gas');

@@ -1,4 +1,4 @@
-import { network, cookies, login, imgCache, Dropdown, ModalWindow, menu, serverURL } from './utils.min.js';
+import { network, storage, login, imgCache, Dropdown, ModalWindow, menu, serverURL } from './utils.min.js';
 
 // create price chart
 export default {
@@ -8,7 +8,6 @@ export default {
     candles: 1000,
     lastCandle: (new Date().getTime() / 1000).toFixed(0),
     allRead: false,
-    network: network.get().symbol,
     config: {
         area: {
             style: 'area',
@@ -23,6 +22,8 @@ export default {
     preferences: { gas: 'area', token: 'candlestick', fee: 'area' },
 
     init: async function () {
+        this.network = (await network.get()).symbol;
+
         document.querySelector('#content #chart.item').innerHTML = `
                 <div class="row">
                     <div id="timeframe-switcher"><button></button></div>
@@ -49,16 +50,8 @@ export default {
         });
 
         // load chart preferences cookie
-        if (cookies.get('chart')) {
-            let chartCookie = null;
-            try {
-                chartCookie = cookies.get('chart', true);
-            }
-            catch (error) {
-                console.log(error);
-                cookies.delete('chart');
-            }
-
+        let chartCookie = await storage.get('chart');
+        if (chartCookie) {
             // test each individually to unsure loading only valid values
             if (chartCookie.gas) {
                 this.preferences.gas = chartCookie.gas;
@@ -280,7 +273,7 @@ export default {
     setCookie: function () {
         const cookieChart = Object.fromEntries(Object.entries(this.series).map(([k, v]) => [k, v.config.style]));
         cookieChart.timeframe = this.timeframe;
-        cookies.set('chart', cookieChart, { json: true });
+        storage.set('chart', cookieChart);
     },
 
     update: function (data) {
@@ -361,7 +354,7 @@ export default {
     },
 
     getHistory: async function (timeframe = 60, page = 1, candles = this.candles) {
-        this.network = network.get().symbol;
+        this.network = (await network.get()).symbol;
         this.timeframe = timeframe;
 
         let query = {
@@ -372,8 +365,10 @@ export default {
             tokenprice: true,
             txfee: true,
         };
-        if (login.get('apikey')) {
-            query.apikey = login.get('apikey');
+
+        const ak = await login.get('apikey');
+        if (ak) {
+            query.apikey = ak;
         }
 
         query = new URLSearchParams(query).toString();

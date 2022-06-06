@@ -159,15 +159,24 @@ const advisor = {
 
         const query = {
             source: 'extension',
+            queryadvisor: true,
             apikey: (await login.get()).apikey,
             accept: this.speed,
         };
         const data = await (await fetch(`${ serverURL }/${ this.network.symbol }/gas?${ new URLSearchParams(query).toString() }`)).json();
         // console.log(data);    
     
-        // const value = (Math.min(this.maxFee, data.speeds[0].estimatedFee * this.fee)).toFixed(4);
-        // valueBox.innerHTML = `$${value}`;
-        valueBox.innerHTML = `<span class="free">FREE</span>`;
+        if (!data.advice){
+            valueBox.innerHTML = `N/A`;
+            return;
+        }
+
+        if (data.advice.free) {
+            valueBox.innerHTML = `<span class="free">FREE</span>`;
+            return;
+        }
+
+        valueBox.innerHTML = `$${ parseFloat(data.advice.fee).toFixed(4) }`;
     }
 };
 

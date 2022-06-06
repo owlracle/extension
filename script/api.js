@@ -114,6 +114,7 @@ const api = {
                 </div>
                 <button id="logout"><i class="fa-solid fa-right-from-bracket"></i>LOGOUT</button>
                 <a href="${ serverURL }/?action=keys&apikey=${data.apiKey}" target="_blank">Visit owlracle.info for more information</a>
+                <a id="policies">Check our privacy and permission policies</a>
             </div>
             <div id="footer" class="logged">${this.footer}</div>
         `;
@@ -121,6 +122,24 @@ const api = {
         container.querySelector('#logout').addEventListener('click', () => {
             login.delete(['apikey', 'logged']);
             menu.click('key');
+        });
+
+        container.querySelector('#policies').addEventListener('click', () => {
+            new ModalWindow({
+                title: 'Our policies',
+                className: 'policies',
+                message: `
+                    <p><b>We do not collect nor store any of your personal data.</b></p>
+                    <p>The extension store your preferences such as chosen network and last tab on <b>local storage. None of this is transmitted to our server.</b></p>
+                    <p>The extension also stores your logged <b>API key on local storage</b>. You use it every time you ask for gas information from our servers.</p>
+                    <p>When using the Tx Advisor, the extension has access to the <b>active tab</b>, just as Metamask, AdBlock, and many other extensions do.</p>
+                    <p>To do its thing, Tx Advisor needs to have access to a global variable set and read by Metamask (<i>window.ethereum</i>). This is the only reason for the active tab permission. <b>No other info about your tab is used or recorded.</b></p>
+                    <p>Our code is <b>open-source</b>. You can always check it <a href="https://github.com/owlracle/extension" target="_blank">here</a>, or <a href="https://discord.gg/bHckPMw3Qu" target="_blank">ask us anything</a>.</p>
+                `,
+                buttons: {
+                    'I understand': () => {},
+                }
+            })
         })
     },
 

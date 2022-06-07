@@ -19,12 +19,11 @@
         "128": "img/icon-128.png"
     },
     "permissions": [
-        "activeTab",
         "storage",
         "notifications"
     ],
     "content_scripts": [{
-        "matches": [ "*://*/*" ],
+        "matches": [ "<all_urls>" ],
         "js": [ "script/contentScript.min.js" ],
         "run_at": "document_end"
     }],
@@ -32,7 +31,7 @@
         "resources": [
             "script/inject.min.js"
         ],
-        "matches": [ "*://*/*" ]
+        "matches": [ "<all_urls>" ]
     }],
     "background": {
         "service_worker": "script/background.min.js"

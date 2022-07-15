@@ -176,7 +176,7 @@ const owlracle = {
             if (res.baseFee) {
                 gasPrice = {
                     maxFeePerGas: speedInfo.gasPrice,
-                    maxPriorityFeePerGas: speedInfo.gasPrice - res.baseFee,
+                    maxPriorityFeePerGas: Math.max(speedInfo.gasPrice - res.baseFee, 0),
                 };
             }
             else {

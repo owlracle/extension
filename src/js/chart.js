@@ -1,5 +1,6 @@
 import * as LightweightCharts from 'lightweight-charts';
 import { network, storage, login, imgCache, Dropdown, ModalWindow, menu, serverURL } from './utils.js';
+import Request from './helpers/request.js';
 
 // create price chart
 export default {
@@ -372,8 +373,7 @@ export default {
             query.apikey = ak;
         }
 
-        query = new URLSearchParams(query).toString();
-        this.history = await (await fetch(`${ serverURL }/${this.network}/history?${query}`)).json();
+        this.history = await new Request({ url: serverURL }).get(`${this.network}/history`, query);
         // console.log(this.history)
         if (this.history.error) {
             new ModalWindow({

@@ -1,3 +1,4 @@
+import Request from './helpers/request.js';
 import { login, network, messageBus, ModalWindow, serverURL } from './utils.js';
 
 // advisor config and methods
@@ -163,7 +164,8 @@ const advisor = {
             apikey: (await login.get()).apikey,
             accept: this.speed,
         };
-        const data = await (await fetch(`${ serverURL }/${ this.network.symbol }/gas?${ new URLSearchParams(query).toString() }`)).json();
+        const data = await new Request({ url: serverURL }).get(`${ this.network.symbol }/gas`, query);
+
         // console.log(data);    
     
         if (!data.advice){

@@ -1,3 +1,5 @@
+import Request from "./helpers/request";
+
 const messageBus = {
     events: {},
 
@@ -162,10 +164,7 @@ const owlracle = {
         }
 
         this.args.apikey = this.apiKey;
-        const url = `${this.url}/${ ntw.name }/gas?${ new URLSearchParams(this.args).toString() }`;
-
-        const req = await fetch(url);
-        const res = await req.json();
+        const res = await new Request({ url: this.url }).get(`${ ntw.name }/gas`, this.args);
 
         if (res.error) {
             return res;

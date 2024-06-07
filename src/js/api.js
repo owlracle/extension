@@ -1,3 +1,4 @@
+import Request from './helpers/request.js';
 import { login, ModalWindow, menu, serverURL } from './utils.js';
 
 const api = {
@@ -81,7 +82,7 @@ const api = {
             container.classList.add('loading');
         }
 
-        const data = await (await fetch(`${ serverURL }/keys/${ apiKey }`)).json();
+        const data = await new Request({ url: serverURL }).get(`keys/${ apiKey }`);
         if (data.error){
             new ModalWindow({
                 title: 'Session expired',
@@ -190,7 +191,7 @@ const api = {
 
             const text = button.innerHTML;
             button.innerHTML = '<i class="fas fa-spin fa-cog"></i>';
-            const data = await (await fetch(`${ serverURL }/keys/${input.value.toLowerCase()}`)).json();
+            const data = await new Request({ url: serverURL }).get(`keys/${input.value.toLowerCase()}`);
             button.innerHTML = text;
             if (data.error && data.status == 401){
                 this.showTip('Could not find your api key');

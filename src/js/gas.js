@@ -1,3 +1,4 @@
+import Request from './helpers/request.js';
 import { network, ModalWindow, login, menu, serverURL } from './utils.js';
 
 const gasTimer = {
@@ -47,8 +48,7 @@ const gasTimer = {
             query.percentile = this.percentile;
         }
 
-        query = new URLSearchParams(query).toString();
-        const data = await (await fetch(`${ serverURL }/${ (await network.get()).symbol }/gas?${ query }`)).json();
+        const data = await new Request({ url: serverURL }).get(`${ (await network.get()).symbol }/gas`, query);
 
         if (data.error && data.status == 403) {
             console.log(data);

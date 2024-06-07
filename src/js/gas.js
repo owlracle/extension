@@ -1,6 +1,7 @@
 import Request from './helpers/request.js';
-import { ModalWindow, login, menu, serverURL } from './utils.js';
+import { login, menu, serverURL } from './utils.js';
 import network from './helpers/network.js';
+import ModalWindow from './components/modal.js';
 
 const gasTimer = {
     cards: [ // preferences for cards

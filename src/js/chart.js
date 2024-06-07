@@ -1,9 +1,10 @@
 import * as LightweightCharts from 'lightweight-charts';
-import { login, imgCache, Dropdown, menu, serverURL } from './utils.js';
+import { login, imgCache, menu, serverURL } from './utils.js';
 import Request from './helpers/request.js';
 import network from './helpers/network.js';
 import storage from './helpers/storage.js';
 import ModalWindow from './components/modal.js';
+import Dropdown from './components/dropdown.js';
 
 // create price chart
 export default {

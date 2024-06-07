@@ -2,7 +2,8 @@ import gasTimer from './gas.js';
 import chart from './chart.js';
 import api from './api.js';
 import advisor from './advisor.js';
-import { login, menu, Dropdown, network, messageBus } from './utils.js';
+import { login, menu, Dropdown, messageBus } from './utils.js';
+import network from './helpers/network.js';
 
 import "../less/popup.less";
 

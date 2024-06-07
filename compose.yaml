@@ -1,0 +1,12 @@
+services:
+    webpack:
+        build: .
+        volumes:
+            - .:/app
+            - node_modules:/app/node_modules
+        environment:
+            - NODE_ENV=development
+        working_dir: /app
+        command: npm start
+volumes:
+    node_modules:

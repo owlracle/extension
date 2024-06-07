@@ -1,4 +1,4 @@
-import { network, ModalWindow, login, menu, serverURL } from './utils.min.js';
+import { network, ModalWindow, login, menu, serverURL } from './utils.js';
 
 const gasTimer = {
     cards: [ // preferences for cards

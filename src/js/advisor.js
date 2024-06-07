@@ -1,4 +1,4 @@
-import { login, network, messageBus, ModalWindow, serverURL } from './utils.min.js';
+import { login, network, messageBus, ModalWindow, serverURL } from './utils.js';
 
 // advisor config and methods
 const advisor = {

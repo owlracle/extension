@@ -1,4 +1,5 @@
-import { network, storage, login, imgCache, Dropdown, ModalWindow, menu, serverURL } from './utils.min.js';
+import * as LightweightCharts from 'lightweight-charts';
+import { network, storage, login, imgCache, Dropdown, ModalWindow, menu, serverURL } from './utils.js';
 
 // create price chart
 export default {

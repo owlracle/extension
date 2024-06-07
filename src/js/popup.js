@@ -1,8 +1,10 @@
-import gasTimer from './gas.min.js';
-import chart from './chart.min.js';
-import api from './api.min.js';
-import advisor from './advisor.min.js';
-import { login, menu, Dropdown, network, messageBus } from './utils.min.js';
+import gasTimer from './gas.js';
+import chart from './chart.js';
+import api from './api.js';
+import advisor from './advisor.js';
+import { login, menu, Dropdown, network, messageBus } from './utils.js';
+
+import "../less/popup.less";
 
 document.addEventListener('DOMContentLoaded', async () => {
     menu.init();

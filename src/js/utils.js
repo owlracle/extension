@@ -1,4 +1,4 @@
-import advisor from './advisor.min.js';
+import advisor from './advisor.js';
 
 const serverURL = 'https://owlracle.info';
 // const serverURL = 'https://738e-179-152-6-27.ngrok.io';

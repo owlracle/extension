@@ -1,35 +1,9 @@
 import advisor from './advisor.js';
 import network from './helpers/network.js';
+import storage from './helpers/storage.js';
 
 const serverURL = 'https://owlracle.info';
 // const serverURL = 'https://738e-179-152-6-27.ngrok.io';
-
-// set the cookie utils object
-const storage = {
-    set: async function(key, value) {
-        const settings = {};
-        settings[key] = value;
-        await chrome.storage.local.set(settings); 
-    },
-
-    get: async function (key) {
-        const obj = await chrome.storage.local.get(key);
-        if (!Object.keys(obj).length) {
-            return false;
-        }
-
-        return obj[key];
-    },
-
-    delete: async function(key) {
-        if (!(await this.get(key))) {
-            return false;
-        }
-
-        await chrome.storage.local.remove(key);
-        return true;
-    },
-};
 
 // NOT USED ANYMORE, maybe will use in the future
 // set the cookie utils object
@@ -389,4 +363,4 @@ const messageBus = {
 }
 
 
-export { storage, login, imgCache, ModalWindow, Dropdown, menu, messageBus, serverURL };
+export { login, imgCache, ModalWindow, Dropdown, menu, messageBus, serverURL };

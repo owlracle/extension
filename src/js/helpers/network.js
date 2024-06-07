@@ -1,4 +1,4 @@
-import { storage } from '../utils.js';
+import storage from "./storage.js";
 
 // set the corresponding network in header
 export default {

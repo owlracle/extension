@@ -1,6 +1,8 @@
 import Request from './helpers/request.js';
 import { login, messageBus, ModalWindow, serverURL } from './utils.js';
 import network from './helpers/network.js';
+import storage from './helpers/storage.js';
+import storage from './helpers/storage.js';
 
 // advisor config and methods
 const advisor = {
@@ -11,14 +13,14 @@ const advisor = {
     set: async function(data) {
         const properties = await this.get();
         Object.entries(data).forEach(([k,v]) => properties[k] = v);
-        await chrome.storage.local.set({ advisor: properties });
+        await storage.set('advisor', properties);
         messageBus.send('advisor', properties);
     },
 
     // return the storage var, or wait until it is ready
     get: async function() {
-        const storage = await chrome.storage.local.get();
-        return storage.advisor || await new Promise(resolve => setTimeout(async () => resolve(await this.get()), 100));
+        const storage = await storage.get('advisor');
+        return storage || await new Promise(resolve => setTimeout(async () => resolve(await this.get()), 100));
     },
 
     init: async function() {

@@ -1,0 +1,124 @@
+#content #chart.item {
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    .row {
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+        margin-bottom: 10px;
+        width: 100%;
+        padding: 0 10px;
+    }
+
+    #style-switcher, #timeframe-switcher {
+        display: flex;
+
+        button {
+            border: 0;
+            outline: none;
+            border-radius: 3px;
+            border: 2px solid var(--border-color);
+            background-color: var(--bg-intense-color);
+            color: var(--text-color);
+            cursor: pointer;
+            transition: 0.3s all;
+            width: 140px;
+            height: 35px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Roboto', sans-serif;
+            font-size: 1rem;
+            
+            &:hover {
+                background-color: var(--bg-color);
+            }
+
+            &.active {
+                background-color: var(--text-color);
+                color: var(--bg-intense-color);
+            }
+
+            img {
+                height: 20px;
+                width: 20px;
+                margin-right: 5px;
+            }
+        }
+    }
+
+    #chart {
+        box-shadow: 0 0 15px #74747424;
+        border: 1px solid var(--border-color);
+        width: 100%;
+    }
+
+    #toggle-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 10px;
+        flex-wrap: wrap;
+
+        button {
+            background-color: transparent;
+            outline: none;
+            border: none;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            margin: 5px 10px;
+            height: 25px;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: 0.3s all;
+            font-size: 1.1rem;
+
+            &:hover {
+                background-color: var(--border-color);
+
+                .mark {
+                    background-color: #4ca69a57;
+                }
+            }
+
+            &.active .mark {
+                background-color: #4ca69aad;
+                border-color: #4CA69A;
+            }
+            
+            .mark {
+                border: 2px solid #E0544E;
+                display: flex;
+                border-radius: 100%;
+                margin-right: 5px;
+                height: 10px;
+                width: 10px;
+                transition: 0.3s background;
+            }
+        }
+    }
+
+    #tooltip-chart {
+        width: 120px;
+        position: absolute;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        z-index: 1;
+        border-radius: 3px;
+        border: 1px solid var(--border-color);
+        padding: 5px 10px 0px;
+        opacity: 0.7;
+
+        div {
+            margin-bottom: 5px;
+        }
+
+        .name {
+            color: var(--text-intense-color);
+        }
+    }
+}

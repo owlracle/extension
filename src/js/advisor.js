@@ -2,7 +2,6 @@ import Request from './helpers/request.js';
 import { login, serverURL } from './utils.js';
 import network from './helpers/network.js';
 import storage from './helpers/storage.js';
-import storage from './helpers/storage.js';
 import ModalWindow from './components/modal.js';
 import messageBus from './helpers/message.js';
 
@@ -21,8 +20,8 @@ const advisor = {
 
     // return the storage var, or wait until it is ready
     get: async function() {
-        const storage = await storage.get('advisor');
-        return storage || await new Promise(resolve => setTimeout(async () => resolve(await this.get()), 100));
+        const storageData = await storage.get('advisor');
+        return storageData || await new Promise(resolve => setTimeout(async () => resolve(await this.get()), 100));
     },
 
     init: async function() {

@@ -1,0 +1,134 @@
+#header {
+    width: 100%;
+    height: 75px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--main-color);
+    color: var(--text-dark-color);
+    box-sizing: border-box;
+    padding: 0 25px 0 15px;
+    box-sizing: border-box;
+
+    &.hidden {
+        display: none;
+    }
+
+    .col {
+        display: flex;
+        align-items: center;
+
+        img {
+            width: 50px;
+            height: 50px;
+        }
+    
+        #site-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            font-family: 'Grandstander',sans-serif;
+            text-shadow: 4px 4px 4px var(--border-color);
+            color: var(--text-intense-color);
+            margin-left: 15px;
+        }
+
+        #network-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            padding: 3px 10px;
+            background-color: transparent;
+            border: 1px solid transparent;
+            border-radius: 3px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: .3s all;
+
+            #name {
+                font-size: 1.1rem;
+            }
+
+            &:hover {
+                filter: brightness(1.3);
+            }
+
+            &.hidden {
+                display: none;
+            }
+
+            &.bsc {
+                .bsc();
+                background-color: darken(@chain-color, 20%);
+                border-color: @chain-color;
+            }
+
+            &.poly {
+                .poly();
+                background-color: darken(@chain-color, 20%);
+                border-color: @chain-color;
+            }
+
+            &.avax {
+                .avax();
+                background-color: darken(@chain-color, 20%);
+                border-color: @chain-color;
+            }
+
+            &.ftm {
+                .ftm();
+                background-color: darken(@chain-color, 20%);
+                border-color: @chain-color;
+            }
+
+            &.cro {
+                .cro();
+                background-color: darken(@chain-color, 20%);
+                border-color: @chain-color;
+            }
+
+            &.movr {
+                .movr();
+                background-color: darken(@chain-color, 20%);
+                border-color: @chain-color;
+            }
+
+            &.eth {
+                .eth();
+                background-color: darken(@chain-color, 20%);
+                border-color: @chain-color;
+            }
+
+            &.one {
+                .one();
+                background-color: darken(@chain-color, 20%);
+                border-color: @chain-color;
+            }
+
+            &.celo {
+                .celo();
+                background-color: darken(@chain-color, 20%);
+                border-color: @chain-color;
+            }
+
+            &.ht {
+                .ht();
+                background-color: darken(@chain-color, 20%);
+                border-color: @chain-color;
+            }
+
+            &.fuse {
+                .fuse();
+                background-color: darken(@chain-color, 20%);
+                border-color: @chain-color;
+            }
+
+            img {
+                height: 20px;
+                width: 20px;
+                margin-right: 5px;
+            }
+        }
+    }
+}

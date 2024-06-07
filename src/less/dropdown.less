@@ -1,0 +1,31 @@
+#dropdown {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    border-radius: 0 0 3px 3px;
+    border: 1px solid #3498db61;
+    
+    .item {
+        padding: 0 10px;
+        width: 130px;
+        display: flex;
+        align-items: center;
+        height: 30px;
+        background-color: #3f789edb;
+        border-bottom: 1px solid #4e8ab399;
+        box-sizing: border-box;
+        transition: 0.3s all;
+        cursor: pointer;
+        text-shadow: 0 0 1px var(--text-color);
+        color: var(--text-color);
+        
+        &:hover {
+            background-color: #3b8bc0;
+        }
+
+        .icon {
+            height: 20px;
+            margin-right: 5px;
+        }
+    }
+}

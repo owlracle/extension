@@ -1,0 +1,101 @@
+#fog {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    left: 0;
+    background-color: #00000090;
+    z-index: 2;
+
+    &.invisible {
+        background-color: transparent;
+    }
+
+    &.dark {
+        background-color: #000;
+    }
+
+    .modal {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        border-radius: 3px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        border-color: var(--border-color);
+        box-shadow: 2px 2px 5px black;
+        width: 95%;
+        max-height: 100%;
+
+        #content {
+            display: flex;
+            flex-direction: column;
+            padding: 0 20px;
+            overflow-y: auto;
+            max-height: 100vh;
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        h2 {
+            margin: 20px;
+            font-size: 1.5rem;
+        }
+
+        p {
+            margin: 5px 0 10px 0;
+
+            &.free {
+                color: #01943f;
+                font-weight: bold;
+            }
+        }
+
+        #button-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            padding: 0 10px;
+
+            button {
+                border: none;
+                border-radius: 3px;
+                height: 35px;
+                width: 200px;
+                outline: none;
+                background-color: var(--main-color);
+                color: var(--text-dark-color);
+                cursor: pointer;
+                transition: 0.3s all;
+                font-size: 1.1rem;
+                margin: 0 5px;
+
+                &:hover {
+                    color: var(--text-dark-intense-color);
+                    filter: brightness(1.2);
+                }
+
+                &:disabled {
+                    background-color: #727272;
+                    box-shadow: none;
+                    cursor: default;
+                    cursor: not-allowed;
+                    filter: none;
+                    color: var(--text-dark-color);
+                }
+            }
+        }
+    }
+
+    &.policies {
+        .modal {
+            p {
+                font-size: 0.9rem;
+            }
+        }
+    }
+}

@@ -1,35 +1,11 @@
 import * as LightweightCharts from 'lightweight-charts';
 import Request from './helpers/request.js';
-import network from './helpers/network.js';
+import Network from './helpers/network.js';
 import storage from './helpers/storage.js';
 import ModalWindow from './components/modal.js';
 import Dropdown from './components/dropdown.js';
 import menu from './components/menu.js';
 import login from './helpers/login.js';
-
-
-// preload images
-const imgCache = (() => {
-    const website = 'https://owlracle.info';
-
-    Object.values(network.getList()).forEach(e => {
-        e.icon = document.createElement('img');
-        e.icon.src = `${website}/img/${e.symbol}.png`;
-    });
-
-    return Object.fromEntries([
-        ...['candle-chart', 'line-chart'].map(e => {
-            const img = document.createElement('img');
-            img.src = `${website}/img/${e}.png`;
-            return [e, img];
-        }),
-        ...['time-10', 'time-30', 'time-60', 'time-120', 'time-240', 'time-1440'].map(e => {
-            const img = document.createElement('img');
-            img.src = `img/${e}.png`;
-            return [e, img];
-        })
-    ]);
-})();
 
 
 // create price chart
@@ -53,8 +29,34 @@ export default {
     },
     preferences: { gas: 'area', token: 'candlestick', fee: 'area' },
 
+    loadImgCache: async function () {
+        // preload images
+        this.imgCache = await (async () => {
+            const website = 'https://owlracle.info';
+
+            Object.values(await Network.getList()).forEach(e => {
+                e.icon = document.createElement('img');
+                e.icon.src = `${website}/img/${e.symbol}.png`;
+            });
+
+            return Object.fromEntries([
+                ...['candle-chart', 'line-chart'].map(e => {
+                    const img = document.createElement('img');
+                    img.src = `${website}/img/${e}.png`;
+                    return [e, img];
+                }),
+                ...['time-10', 'time-30', 'time-60', 'time-120', 'time-240', 'time-1440'].map(e => {
+                    const img = document.createElement('img');
+                    img.src = `img/${e}.png`;
+                    return [e, img];
+                })
+            ]);
+        })();
+    },
+
     init: async function () {
-        this.network = (await network.get()).symbol;
+        this.network = (await new Network().get()).symbol;
+        await this.loadImgCache();
 
         document.querySelector('#content #chart.item').innerHTML = `
                 <div class="row">
@@ -155,12 +157,12 @@ export default {
         new Dropdown({
             button: document.querySelector('#content #chart.item #timeframe-switcher button'),
             itemList: [
-                { id: 'tf-10', innerHTML: `<img class="icon" src="${imgCache['time-10'].src}">10 minutes` },
-                { id: 'tf-30', innerHTML: `<img class="icon" src="${imgCache['time-30'].src}">30 minutes` },
-                { id: 'tf-60', innerHTML: `<img class="icon" src="${imgCache['time-60'].src}">1 hour` },
-                { id: 'tf-120', innerHTML: `<img class="icon" src="${imgCache['time-120'].src}">2 hours` },
-                { id: 'tf-240', innerHTML: `<img class="icon" src="${imgCache['time-240'].src}">4 hours` },
-                { id: 'tf-1440', innerHTML: `<img class="icon" src="${imgCache['time-1440'].src}">1 day` },
+                { id: 'tf-10', innerHTML: `<img class="icon" src="${this.imgCache['time-10'].src}">10 minutes` },
+                { id: 'tf-30', innerHTML: `<img class="icon" src="${this.imgCache['time-30'].src}">30 minutes` },
+                { id: 'tf-60', innerHTML: `<img class="icon" src="${this.imgCache['time-60'].src}">1 hour` },
+                { id: 'tf-120', innerHTML: `<img class="icon" src="${this.imgCache['time-120'].src}">2 hours` },
+                { id: 'tf-240', innerHTML: `<img class="icon" src="${this.imgCache['time-240'].src}">4 hours` },
+                { id: 'tf-1440', innerHTML: `<img class="icon" src="${this.imgCache['time-1440'].src}">1 day` },
             ],
             clickFn: b => this.timeframeSwitch(b.id.split('tf-')[1]),
         });
@@ -191,8 +193,8 @@ export default {
         new Dropdown({
             button: document.querySelector('#content #chart.item #style-switcher button'),
             itemList: [
-                { id: 'style-area', innerHTML: `<img class="icon" src="${imgCache['line-chart'].src}">Area` },
-                { id: 'style-candlestick', innerHTML: `<img class="icon" src="${imgCache['candle-chart'].src}">Candlestick` },
+                { id: 'style-area', innerHTML: `<img class="icon" src="${this.imgCache['line-chart'].src}">Area` },
+                { id: 'style-candlestick', innerHTML: `<img class="icon" src="${this.imgCache['candle-chart'].src}">Candlestick` },
             ],
             clickFn: async b => {
                 if (this.queryHistory) {
@@ -215,7 +217,7 @@ export default {
 
                 serie.series.applyOptions({ visible: serie.visible });
 
-                styleswitcher.innerHTML = `<img src="${imgCache[`${this.preferences[this.mode] == 'candlestick' ? 'candle' : 'line'}-chart`].src}">${this.preferences[this.mode][0].toUpperCase() + this.preferences[this.mode].slice(1)}`;
+                styleswitcher.innerHTML = `<img src="${this.imgCache[`${this.preferences[this.mode] == 'candlestick' ? 'candle' : 'line'}-chart`].src}">${this.preferences[this.mode][0].toUpperCase() + this.preferences[this.mode].slice(1)}`;
 
                 this.setCookie();
                 this.queryHistory = false;
@@ -241,7 +243,7 @@ export default {
                 series.visible = true;
                 this.mode = a.id;
 
-                document.querySelector(`#content #chart.item #style-switcher button`).innerHTML = `<img src="${imgCache[`${this.preferences[this.mode] == 'candlestick' ? 'candle' : 'line'}-chart`].src}">${this.preferences[this.mode][0].toUpperCase() + this.preferences[this.mode].slice(1)}`;
+                document.querySelector(`#content #chart.item #style-switcher button`).innerHTML = `<img src="${this.imgCache[`${this.preferences[this.mode] == 'candlestick' ? 'candle' : 'line'}-chart`].src}">${this.preferences[this.mode][0].toUpperCase() + this.preferences[this.mode].slice(1)}`;
             }
             else {
                 a.classList.remove('active');
@@ -286,7 +288,7 @@ export default {
                 1440: '1 day',
             })[time];
         })(time);
-        tfswitcher.innerHTML = `<img src="${imgCache[`time-${time}`].src}">${text}`;
+        tfswitcher.innerHTML = `<img src="${this.imgCache[`time-${time}`].src}">${text}`;
 
         this.update(history);
         this.setCookie();
@@ -386,7 +388,7 @@ export default {
     },
 
     getHistory: async function (timeframe = 60, page = 1, candles = this.candles) {
-        this.network = (await network.get()).symbol;
+        this.network = (await new Network().get()).symbol;
         this.timeframe = timeframe;
 
         let query = {

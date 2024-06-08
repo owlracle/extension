@@ -1,5 +1,5 @@
 import Request from './helpers/request.js';
-import network from './helpers/network.js';
+import Network from './helpers/network.js';
 import ModalWindow from './components/modal.js';
 import menu from './components/menu.js';
 import login from './helpers/login.js';
@@ -35,7 +35,8 @@ const gasTimer = {
 
         let query = {
             accept: this.cards.map(e => e.accept).join(','),
-            source: 'extension'
+            source: 'extension',
+            eip1559: false,
         };
 
         const ak = await login.get('apikey');
@@ -51,7 +52,7 @@ const gasTimer = {
             query.percentile = this.percentile;
         }
 
-        const data = await new Request().get(`${ (await network.get()).symbol }/gas`, query);
+        const data = await new Request().get(`${ (await new Network().get()).symbol }/gas`, query);
 
         if (data.error && data.status == 403) {
             console.log(data);

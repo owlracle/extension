@@ -1,5 +1,5 @@
 import Request from './helpers/request.js';
-import network from './helpers/network.js';
+import Network from './helpers/network.js';
 import storage from './helpers/storage.js';
 import ModalWindow from './components/modal.js';
 import messageBus from './helpers/message.js';
@@ -133,7 +133,7 @@ const advisor = {
                 return false;
             }
 
-            const ntw = await network.get(message);
+            const ntw = await new Network(message).get();
             if (!ntw) {
                 return false;
             }

@@ -1,34 +1,39 @@
 import storage from "./storage.js";
+import Request from "./request.js";
 
 // set the corresponding network in header
-export default {
-    list: {
-        eth: { symbol: 'eth', name: 'Ethereum' },
-        bsc: { symbol: 'bsc', name: 'BSC' },
-        poly: { symbol: 'poly', name: 'Polygon' },
-        ftm: { symbol: 'ftm', name: 'Fantom' },
-        avax: { symbol: 'avax', name: 'Avalanche' },
-        cro: { symbol: 'cro', name: 'Cronos' },
-        movr: { symbol: 'movr', name: 'Moonriver' },
-        one: { symbol: 'one', name: 'Harmony' },
-        ht: { symbol: 'ht', name: 'Heco' },
-        celo: { symbol: 'celo', name: 'Celo' },
-        fuse: { symbol: 'fuse', name: 'Fuse' },
-    },
+export default class Network {
+    
+    static list = {};
 
-    get: async function (name) {
-        if (!name) {
-            name = (await storage.get('network')) || 'eth';
+    constructor(network) {
+        this.network = network;
+    }
+
+    static async getList() {
+        if (!Network.list || Object.keys(Network.list).length == 0) {
+            const networkList = await new Request().get('rpc');
+            Network.list = {};
+            networkList.forEach(network => {
+                Network.list[network.network] = {
+                    symbol: network.network,
+                    name: network.name.charAt(0).toUpperCase() + network.name.slice(1),
+                };
+            });
+        }
+        return Network.list;
+    }
+
+    async get() {
+        if (!this.network) {
+            this.network = (await storage.get('network')) || 'eth';
         }
 
-        return this.list[name];
-    },
+        return (await Network.getList())[this.network];
+    }
 
-    set: function (name) {
-        storage.set('network', name);
-    },
-
-    getList: function () {
-        return this.list;
+    set(network) {
+        this.network = network;
+        storage.set('network', this.network);
     }
 }

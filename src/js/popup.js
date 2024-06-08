@@ -3,12 +3,14 @@ import chart from './chart.js';
 import api from './api.js';
 import advisor from './advisor.js';
 import login from './helpers/login.js';
-import network from './helpers/network.js';
+import Network from './helpers/network.js';
 import Dropdown from './components/dropdown.js';
 import menu from './components/menu.js';
 import messageBus from './helpers/message.js';
 
 import "../less/popup.less";
+
+const website = 'https://owlracle.info';
 
 document.addEventListener('DOMContentLoaded', async () => {
     menu.init();
@@ -27,12 +29,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 this.element.classList.remove('hidden');
             }
     
-            const ntw = await network.get();
-            document.querySelector('#header #link').href = `https://owlracle.info/${ ntw.symbol }`;
+            const ntw = await new Network().get();
+            document.querySelector('#header #link').href = `${website}/${ ntw.symbol }`;
     
             this.element.removeAttribute('class');
             this.element.classList.add(ntw.symbol);
-            this.element.querySelector('img').src = `https://owlracle.info/img/${ ntw.symbol }.png`;
+            this.element.querySelector('img').src = `${website}/img/${ ntw.symbol }.png`;
             this.element.querySelector('span').innerHTML = ntw.name;
     
             if (menu.getActive() == 'gas'){
@@ -47,13 +49,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             return this.element;
         },
     
-        bindClick: function() {
+        bindClick: async function() {
             // network button action
             new Dropdown({
                 button: this.element,
-                itemList: Object.values(network.getList()).map(e => { return { id: e.symbol, innerHTML: `<img class="icon" src="${e.icon.src}" alt="${e.name} icon"><span class="name">${e.name}</span>` }}),
+                itemList: Object.values(await Network.getList()).map(e => ({ id: e.symbol, innerHTML: `<img class="icon" src="${website}/img/${e.symbol}.png" alt="${e.name} icon"><span class="name">${e.name}</span>` })),
                 clickFn: e => {
-                    network.set(e.id);
+                    new Network().set(e.id);
                     this.reload();
                 },
             });
@@ -95,8 +97,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             return false;
         }
 
-        const ntw = await network.get(message.message.network);
-        document.querySelector('#content #advisor #network-container #network').innerHTML = `<img src="https://owlracle.info/img/${ntw.symbol}.png"><span>${ntw.name}</span>`;
+        const ntw = await new Network(message.message.network).get();
+        document.querySelector('#content #advisor #network-container #network').innerHTML = `<img src="${website}/img/${ntw.symbol}.png"><span>${ntw.name}</span>`;
         advisor.network = ntw;
         advisor.setCost();
         return true;

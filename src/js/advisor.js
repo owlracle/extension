@@ -1,9 +1,10 @@
 import Request from './helpers/request.js';
-import { login, serverURL } from './utils.js';
+import { serverURL } from './utils.js';
 import network from './helpers/network.js';
 import storage from './helpers/storage.js';
 import ModalWindow from './components/modal.js';
 import messageBus from './helpers/message.js';
+import login from './helpers/login.js';
 
 // advisor config and methods
 const advisor = {

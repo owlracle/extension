@@ -1,7 +1,8 @@
 import Request from './helpers/request.js';
-import { login, serverURL } from './utils.js';
+import { serverURL } from './utils.js';
 import ModalWindow from './components/modal.js';
 import menu from './components/menu.js';
+import login from './helpers/login.js';
 
 const api = {
     footer: `

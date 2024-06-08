@@ -104,7 +104,6 @@ network.changeWatcher();
 
 const owlracle = {
     url: 'https://owlracle.info',
-    // url: 'https://738e-179-152-6-27.ngrok.io',
     speed: 0,
     args: {
         accept: '75',
@@ -248,7 +247,7 @@ if (window.ethereum) {
     messageBus.addEvent('advisor', message => {
         if (!owlracle.apiKey && message.apiKey) {
             console.log(`🦉 You are taking Owlracle's advice for gas price settings on your Metamask transactions 🦉`);
-            console.log(`🦉 Check our website https://owlracle.info or get in touch at https://discord.gg/zYS4f8eRbC 🦉`);
+            console.log(`🦉 Check our website ${owlracle.url} or get in touch at ${owlracle.url}/discord-support 🦉`);
         }
         
         // console.log(message)

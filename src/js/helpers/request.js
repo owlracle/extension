@@ -1,6 +1,9 @@
 export default class Request {
-    constructor({ url, headers }) {
-        this.url = url;
+
+    static url = 'https://api.owlracle.info';
+
+    constructor({ url, headers }={}) {
+        this.url = url || Request.url;
         this.headers = new Headers(headers || {});
     }
 

@@ -1,10 +1,12 @@
 import Request from './helpers/request.js';
-import { serverURL } from './utils.js';
 import ModalWindow from './components/modal.js';
 import menu from './components/menu.js';
 import login from './helpers/login.js';
 
 const api = {
+
+    website: 'https://owlracle.info',
+
     footer: `
         <a class="item" href="https://github.com/owlracle" target="_blank"><i class="fa-brands fa-github"></i></a>
         <a class="item" href="https://discord.gg/zYS4f8eRbC" target="_blank"><i class="fa-brands fa-discord"></i></a>
@@ -32,7 +34,7 @@ const api = {
             <div id="content">
                 <h1>Welcome to <span id="site-name">Owlracle</span>!</h1>
                 <h2>The Multichain Gas Price Tracker</h2>
-                <a href="https://owlracle.info" target="_blank"><img id="logo" src="https://owlracle.info/img/owl.webp"></a>
+                <a href="${this.website}" target="_blank"><img id="logo" src="${this.website}/img/owl.webp"></a>
                 <button id="new">Create New Api Key</button>
                 <button id="login">Login with Existing Api Key</button>
                 <button id="guest">Continue as Guest</button>
@@ -85,7 +87,7 @@ const api = {
             container.classList.add('loading');
         }
 
-        const data = await new Request({ url: serverURL }).get(`keys/${ apiKey }`);
+        const data = await new Request().get(`keys/${ apiKey }`);
         if (data.error){
             new ModalWindow({
                 title: 'Session expired',
@@ -117,7 +119,7 @@ const api = {
                     <input class="input" value="${data.usage.apiKeyTotal}" readonly>
                 </div>
                 <button id="logout"><i class="fa-solid fa-right-from-bracket"></i>LOGOUT</button>
-                <a href="${ serverURL }/?action=keys&apikey=${data.apiKey}" target="_blank">Visit owlracle.info for more information</a>
+                <a href="${ this.website }/?action=keys&apikey=${data.apiKey}" target="_blank">Visit ${this.website} for more information</a>
                 <a id="policies">Check our privacy and permission policies</a>
             </div>
             <div id="footer" class="logged">${this.footer}</div>
@@ -194,7 +196,7 @@ const api = {
 
             const text = button.innerHTML;
             button.innerHTML = '<i class="fas fa-spin fa-cog"></i>';
-            const data = await new Request({ url: serverURL }).get(`keys/${input.value.toLowerCase()}`);
+            const data = await new Request().get(`keys/${input.value.toLowerCase()}`);
             button.innerHTML = text;
             if (data.error && data.status == 401){
                 this.showTip('Could not find your api key');
@@ -243,7 +245,7 @@ const api = {
     },
 
     newApiKey: function() {
-        window.open(`${ serverURL }/?action=newkey`);
+        window.open(`${ this.website }/?action=newkey`);
     }
 }
 

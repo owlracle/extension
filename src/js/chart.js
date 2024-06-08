@@ -1,5 +1,4 @@
 import * as LightweightCharts from 'lightweight-charts';
-import { imgCache, serverURL } from './utils.js';
 import Request from './helpers/request.js';
 import network from './helpers/network.js';
 import storage from './helpers/storage.js';
@@ -7,6 +6,31 @@ import ModalWindow from './components/modal.js';
 import Dropdown from './components/dropdown.js';
 import menu from './components/menu.js';
 import login from './helpers/login.js';
+
+
+// preload images
+const imgCache = (() => {
+    const website = 'https://owlracle.info';
+
+    Object.values(network.getList()).forEach(e => {
+        e.icon = document.createElement('img');
+        e.icon.src = `${website}/img/${e.symbol}.png`;
+    });
+
+    return Object.fromEntries([
+        ...['candle-chart', 'line-chart'].map(e => {
+            const img = document.createElement('img');
+            img.src = `${website}/img/${e}.png`;
+            return [e, img];
+        }),
+        ...['time-10', 'time-30', 'time-60', 'time-120', 'time-240', 'time-1440'].map(e => {
+            const img = document.createElement('img');
+            img.src = `img/${e}.png`;
+            return [e, img];
+        })
+    ]);
+})();
+
 
 // create price chart
 export default {
@@ -379,7 +403,7 @@ export default {
             query.apikey = ak;
         }
 
-        this.history = await new Request({ url: serverURL }).get(`${this.network}/history`, query);
+        this.history = await new Request().get(`${this.network}/history`, query);
         // console.log(this.history)
         if (this.history.error) {
             new ModalWindow({

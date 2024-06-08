@@ -1,5 +1,4 @@
 import Request from './helpers/request.js';
-import { serverURL } from './utils.js';
 import network from './helpers/network.js';
 import ModalWindow from './components/modal.js';
 import menu from './components/menu.js';
@@ -52,7 +51,7 @@ const gasTimer = {
             query.percentile = this.percentile;
         }
 
-        const data = await new Request({ url: serverURL }).get(`${ (await network.get()).symbol }/gas`, query);
+        const data = await new Request().get(`${ (await network.get()).symbol }/gas`, query);
 
         if (data.error && data.status == 403) {
             console.log(data);

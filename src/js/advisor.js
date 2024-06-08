@@ -1,5 +1,4 @@
 import Request from './helpers/request.js';
-import { serverURL } from './utils.js';
 import network from './helpers/network.js';
 import storage from './helpers/storage.js';
 import ModalWindow from './components/modal.js';
@@ -169,7 +168,7 @@ const advisor = {
             apikey: (await login.get()).apikey,
             accept: this.speed,
         };
-        const data = await new Request({ url: serverURL }).get(`${ this.network.symbol }/gas`, query);
+        const data = await new Request().get(`${ this.network.symbol }/gas`, query);
 
         // console.log(data);    
     

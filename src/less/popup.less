@@ -10,29 +10,44 @@
 @import "advisor.less";
 @import "key.less";
 
-
-.bsc { @chain-color: #daaa10; }
-.poly { @chain-color: #7533E2; }
-.avax { @chain-color: #E84142; }
-.ftm { @chain-color: #1A7CE4; }
-.cro { @chain-color: #113e67; }
-.movr { @chain-color: #50cbc6; }
-.eth { @chain-color: #5c5c5c; }
-.ht { @chain-color: #01943f; }
-.one { @chain-color: #00d8af; }
-.celo { @chain-color: #35cf7f; }
-.fuse { @chain-color: #b3c05d; }
-
-
+.bsc { --chain-color: 160, 128, 22; }
+.poly { --chain-color: 117, 51, 226; }
+.avax { --chain-color: 206, 89, 89; }
+.ftm { --chain-color: 26, 124, 228; }
+.cro { --chain-color: 17, 62, 103; }
+.movr { --chain-color: 31, 133, 129; }
+.eth { --chain-color: 92, 92, 92; }
+.ht { --chain-color: 1, 148, 63; }
+.one { --chain-color: 3, 128, 105; }
+.celo { --chain-color: 39, 151, 93; }
+.fuse { --chain-color: 120, 133, 41; }
+.atom { --chain-color: 47, 49, 72; }
+.juno { --chain-color: 145, 85, 80; }
+.osmo { --chain-color: 186, 7, 209; }
+.aurora { --chain-color: 72, 134, 49; }
+.arb { --chain-color: 40, 160, 240; }
+.opt { --chain-color: 209, 46, 40; }
+.goerli { --chain-color: 143, 143, 143; }
+.sepolia { --chain-color: 143, 143, 143; }
+.pulse { --chain-color: 174, 4, 242; }
+.base { --chain-color: 50, 83, 255; }
+.linea { --chain-color: 0, 0, 0; }
+.blast { --chain-color: 132, 134, 0; }
+.mantle { --chain-color: 117, 117, 117; }
 
 body {
+    --chain-color: 63, 120, 158;
+
+    --extension-width: 360px;
+    --extension-height: 600px;
+
     font-family: 'Roboto', Helvetica, Arial, sans-serif;
     margin: 0;
     transition: 0.3s background-color, 0.3s color;
     background-color: var(--bg-color);
     color: var(--text-color);
-    width: 360px;
-    height: 600px;
+    width: var(--extension-width);
+    height: var(--extension-height);
     display: flex;
     flex-direction: column;
     margin: auto;

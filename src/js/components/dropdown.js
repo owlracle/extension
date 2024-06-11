@@ -19,11 +19,11 @@ export default class Dropdown {
                 dropdown.appendChild(item);
             });
 
-            if (!position) {
-                position = { top: 0, left: 0 };
-            }
-            dropdown.style.top = `${this.offsetTop + this.clientHeight + position.top}px`;
-            dropdown.style.left = `${this.offsetLeft + position.left}px`;
+            // if (!position) {
+            //     position = { top: 0, left: 0 };
+            // }
+            // dropdown.style.top = `${this.offsetTop + this.clientHeight + position.top}px`;
+            // dropdown.style.left = `${this.offsetLeft + position.left}px`;
 
             const fog = document.createElement('div');
             fog.id = 'fog';

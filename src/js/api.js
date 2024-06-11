@@ -88,6 +88,7 @@ const api = {
         }
 
         const data = await new Request().get(`keys/${ apiKey }`);
+        // console.log(data);
         if (data.error){
             new ModalWindow({
                 title: 'Session expired',
@@ -112,11 +113,11 @@ const api = {
                 </div>
                 <div class="row">
                     <span>Usage 1h</span>
-                    <span>Usage Total</span>
+                    <span>Charged 1h</span>
                 </div>
                 <div class="row">
-                    <input class="input" value="${data.usage.apiKeyHour}" readonly>
-                    <input class="input" value="${data.usage.apiKeyTotal}" readonly>
+                    <input class="input" value="${data.usage.total1h}" readonly>
+                    <input class="input" value="${data.usage.charged1h}" readonly>
                 </div>
                 <button id="logout"><i class="fa-solid fa-right-from-bracket"></i>LOGOUT</button>
                 <a href="${ this.website }/?action=keys&apikey=${data.apiKey}" target="_blank">Visit ${this.website} for more information</a>

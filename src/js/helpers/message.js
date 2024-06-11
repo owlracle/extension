@@ -56,9 +56,14 @@ export default class Message {
         return new Promise(async resolve => {
             if (!chrome.tabs) return resolve(null);
             const tabs = await chrome.tabs.query({active: true, currentWindow: true});
-            const response = await chrome.tabs.sendMessage(tabs[0].id, { channel, message });
-            // console.log('response from popup 2', response);
-            resolve(response);
+            try {
+                const response = await chrome.tabs.sendMessage(tabs[0].id, { channel, message });
+                // console.log('response from popup 2', response);
+                resolve(response);
+            }
+            catch (e) {
+                resolve(null);
+            }
         });
     }
 

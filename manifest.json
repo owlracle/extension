@@ -24,16 +24,16 @@
     ],
     "content_scripts": [{
         "matches": [ "<all_urls>" ],
-        "js": [ "script/contentScript.min.js" ],
+        "js": [ "dist/contentScript.min.js" ],
         "run_at": "document_end"
     }],
     "web_accessible_resources": [{
         "resources": [
-            "script/inject.min.js"
+            "dist/inject.min.js"
         ],
         "matches": [ "<all_urls>" ]
     }],
     "background": {
-        "service_worker": "script/background.min.js"
+        "service_worker": "dist/background.min.js"
     }
 }

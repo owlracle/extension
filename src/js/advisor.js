@@ -2,7 +2,7 @@ import Request from './helpers/request.js';
 import Network from './helpers/network.js';
 import storage from './helpers/storage.js';
 import ModalWindow from './components/modal.js';
-import messageBus from './helpers/message.js';
+import Message from './helpers/message.js';
 import login from './helpers/login.js';
 
 // advisor config and methods
@@ -10,12 +10,13 @@ const advisor = {
     speed: '75',
     fee: 0.1,
     maxFee: 0.1,
+    website: 'https://owlracle.info',
 
     set: async function(data) {
         const properties = await this.get();
         Object.entries(data).forEach(([k,v]) => properties[k] = v);
         await storage.set('advisor', properties);
-        messageBus.send('advisor', properties);
+        new Message('advisor').send(properties);
     },
 
     // return the storage var, or wait until it is ready
@@ -72,7 +73,7 @@ const advisor = {
                 </div>
                 <input type="range" min="35" max="100" step="5" value="${ this.speed }" class="range">
             </div>
-            <a href="https://discord.gg/yj4n3pk9Nq" target="_blank">Found a bug? Please report.</a>
+            <a href="${this.website}/discord-support" target="_blank">Found a bug? Please report.</a>
         </div>`;
 
         container.querySelectorAll('input.range').forEach(e => createInputRange(e));
@@ -124,8 +125,8 @@ const advisor = {
         });
 
         // request network to inject (when popup open)
-        messageBus.send('get-network', {} , async message => {
-            // console.log(message)
+        new Message('get-network').send({} , async message => {
+            console.log('message received', message);
             if (!message) {
                 container.querySelector('#network-container #network').innerHTML = `<b class="red">Unsupported network</b>`;
                 this.network = false;
@@ -138,7 +139,7 @@ const advisor = {
                 return false;
             }
 
-            container.querySelector('#network-container #network').innerHTML = `<img src="https://owlracle.info/img/${ ntw.symbol }.png"><span>${ ntw.name }</span>`;
+            container.querySelector('#network-container #network').innerHTML = `<img src="${this.website}/img/${ ntw.symbol }.png"><span>${ ntw.name }</span>`;
             this.network = ntw;
             this.setCost();
             return true;
@@ -170,7 +171,7 @@ const advisor = {
         };
         const data = await new Request().get(`${ this.network.symbol }/gas`, query);
 
-        // console.log(data);    
+        // console.log(data);
     
         if (!data.advice){
             valueBox.innerHTML = `N/A`;

@@ -1,84 +1,13 @@
+import Message from "./helpers/message.js";
+import MessageDOM from "./helpers/messageDom.js";
+
 // code to inject script into DOM
 const script = document.createElement('script');
-script.src = chrome.runtime.getURL('script/inject.min.js');
+script.src = chrome.runtime.getURL('dist/inject.min.js');
 script.type = 'module';
 (document.head||document.documentElement).appendChild(script);
 script.onload = () => script.remove();
 // console.log('contentScript loaded');
-
-const messageDOM = {
-    events: {},
-
-    watchDomMessage: async function(id) {
-        return new Promise(resolve => {
-            const checkInt = setInterval( () => {
-                const extMessageContainer = document.querySelector('#' + id);
-                if (extMessageContainer) {
-                    const extMessage = JSON.parse(extMessageContainer.value);
-                    extMessageContainer.remove();
-                    clearInterval(checkInt);
-                    resolve(extMessage);
-                }
-            }, 100);
-        });
-    },
-    
-    writeDomMessage: function(id, message) {
-        const el = document.createElement('input');
-        el.id = id;
-        el.type = 'hidden';
-        el.value = JSON.stringify(message);
-        document.body.insertAdjacentElement('beforeend', el);
-    },
-    
-    
-    // write dom message and wait for reply
-    send: async function(message) {
-        // console.log(message)
-        this.writeDomMessage('extension-message-received', message);
-        // watch for reply from inject, and send reply back to popup
-        return await this.watchDomMessage('extension-message-received-reply');
-    },
-
-    addEvent: function(name, callback) {
-        this.events[name] = callback;
-    },
-    
-    watch: async function() {
-        // watch for messages sent from inject, so send them to popup
-        const message = await this.watchDomMessage('extension-message-sent');
-        
-        if (Object.keys(this.events).includes(message.event)) {
-            this.events[message.event](message.message);
-        }
-        else {
-            // send message to popup and wait for reply to put the reply on dom
-            chrome.runtime.sendMessage(message, response => {
-                // console.log(message, response)
-                this.writeDomMessage('extension-message-sent-reply', response);
-            });
-        }
-    
-        setTimeout(() => this.watch(), 100);
-    },
-}
-messageDOM.watch();
-
-
-// listen to popup, once message received create dom element to inject retrieve it
-chrome.runtime.onMessage.addListener((message, sender, reply) => {
-    // console.log(message)
-
-    // received a message from popup to update advisor info
-    if (message.event == 'advisor') {
-        advisor.updateDOM().then(() => reply('ok'));
-    }
-    else {
-        messageDOM.send(message).then(response => reply(response));
-    }
-
-    return true; // only when return true the reply callback can be called async
-});
 
 
 // advisor config and methods
@@ -106,7 +35,7 @@ const advisor = {
     updateDOM: async function(init=false) {
         const advProp = await (init ? this.init() : this.get());
 
-        const message = { event: 'advisor' };
+        const message = {};
 
         if (advProp.enabled) {
             if (advProp.apiKey) {
@@ -123,10 +52,37 @@ const advisor = {
             message.apiKey = false;
         }
 
-        messageDOM.send(message);
+        new MessageDOM('advisor').send(message);
     },
 };
 
 
+// listen to popup, once message received create dom element to inject retrieve it
+new Message('advisor').listen(async message => {
+    // console.log(message)
+    // received a message from popup to update advisor info
+    await advisor.updateDOM();
+    return true;
+});
+
 // set api key when page load
 advisor.updateDOM(true);
+
+
+// route messages from inject to popup
+new MessageDOM([
+    'notification-gas',
+    'network',
+]).listen(async (message, channel) => {
+    new Message(channel).send(message);
+});
+
+// route messages from popup to inject
+new Message([
+    'get-network',
+]).listen(async (message, channel) => {
+    // console.log('listener', message, channel);
+    const response = await new MessageDOM(channel).send(message);
+    // console.log('response', response)
+    return response;
+});

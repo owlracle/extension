@@ -1,46 +1,62 @@
-export default {
-    events: {},
+export default class Message {
+    static events = {};
+    static watching = false;
 
-    // watch from message from contentScript
-    watch: async function() {
+    constructor(channels = []) {
+        this.channels = Array.isArray(channels) ? channels : [channels];
+
+        if (!Message.watching) {
+            Message.watchFromPopup();
+            Message.watching = true;
+        }
+    }
+
+    static watchFromPopup() {
         chrome.runtime.onMessage.addListener((message, sender, reply) => {
-            // console.log(sender)
-            
-            let replyMsg = 'Message received';
-            if (this.events[message.event]) {
-                replyMsg = this.events[message.event](message);
-            }
-
-            if (reply){
-                reply(replyMsg);
-            }
-        });
-    },
-
-    // add event listener: function to be called when messages are received
-    addEvent: function(name, callback) {
-        this.events[name] = callback;
-    },
-
-    // send to contentScript
-    send: function(event, message, reply, background=false) {
-        // console.log(event, message)
-        if (background) {
-            chrome.runtime.sendMessage({ event: event, message: message }, response => {
-                if (reply) {
+            if (message.channel && Message.events[message.channel]) {
+                Message.events[message.channel](message.message, message.channel).then(response => {
+                    // console.log('replyMsg from popup', message, response, Object.keys(Message.events));
                     reply(response);
-                }
+                });
+            }
+            else {
+                reply(null);
+            }
+            return true;
+        });
+    }
+
+    async listen(callback) {
+        this.channels.forEach(channel => Message.events[channel] = callback);
+    }
+
+    async send(message, reply = () => {}) {
+        let replyList = [];
+        this.channels.forEach(channel => {
+            const replyPopup = this.sendToPopup(channel, message);
+            replyList.push(replyPopup);
+        });
+        replyList = (await Promise.all(replyList)).find(reply => reply !== null);
+        // console.log('replyList', replyList)
+        reply(replyList);
+    }
+
+    async sendToPopup(channel, message, background = false) {
+        // console.log('sendToPopup', channel, message, background)
+        if (background) {
+            return new Promise(async resolve => {
+                const response = await chrome.runtime.sendMessage({ channel, message });
+                // console.log('response from popup 1', response)
+                resolve(response);
             });
-            return;
         }
 
-        chrome.tabs.query({active: true, currentWindow: true}, tabs => {
-            chrome.tabs.sendMessage(tabs[0].id, { event: event, message: message }, response => {
-                // console.log(response)
-                if (reply) {
-                    reply(response);
-                }
-            });
+        return new Promise(async resolve => {
+            const tabs = await chrome.tabs.query({active: true, currentWindow: true});
+            const response = await chrome.tabs.sendMessage(tabs[0].id, { channel, message });
+            // console.log('response from popup 2', response);
+            resolve(response);
         });
-    },
+    }
+
 }

@@ -6,7 +6,7 @@ import login from './helpers/login.js';
 import Network from './helpers/network.js';
 import Dropdown from './components/dropdown.js';
 import menu from './components/menu.js';
-import messageBus from './helpers/message.js';
+import Message from './helpers/message.js';
 
 import "../less/popup.less";
 
@@ -85,19 +85,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     menu.click(menuOpt);
 
-    messageBus.watch();
-
     // listen to network switching
-    messageBus.addEvent('network', async message => {
+    new Message('network').listen(async message => {
         // console.log(message);
-        if (!message.message.network) {
+        if (!message.network) {
             document.querySelector('#content #advisor #network-container #network').innerHTML = `<b class="red">Unsupported network</b>`;
             advisor.network = false;
             advisor.setCost();
             return false;
         }
 
-        const ntw = await new Network(message.message.network).get();
+        const ntw = await new Network(message.network).get();
         document.querySelector('#content #advisor #network-container #network').innerHTML = `<img src="${website}/img/${ntw.symbol}.png"><span>${ntw.name}</span>`;
         advisor.network = ntw;
         advisor.setCost();

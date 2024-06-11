@@ -1,61 +1,5 @@
-import Request from "./helpers/request";
-
-const messageBus = {
-    events: {},
-
-    watchDomMessage: async function(id) {
-        return new Promise(resolve => {
-            const checkInt = setInterval( () => {
-                const extMessageContainer = document.querySelector('#' + id);
-                if (extMessageContainer) {
-                    const extMessage = extMessageContainer.value !== 'undefined' ? JSON.parse(extMessageContainer.value) : false;
-                    extMessageContainer.remove();
-                    clearInterval(checkInt);
-                    resolve(extMessage);
-                }
-            }, 100);
-        });
-    },
-
-    // watch for dom for received messages from contentScript
-    watch: async function() {
-        const message = await this.watchDomMessage('extension-message-received');
-        // console.log(message)
-    
-        let replyMsg = 'Message received, but no reply given';
-        if (message.event && this.events[message.event]) {
-            replyMsg = await this.events[message.event](message);
-        }
-        this.writeDomMessage('extension-message-received-reply', replyMsg);
-    
-        setTimeout(() => this.watch(), 100);
-    },
-
-    // add event listener: function to be called when messages are received
-    addEvent: function(name, callback) {
-        this.events[name] = callback;
-    },
-
-    writeDomMessage: function(id, message) {
-        const el = document.createElement('input');
-        el.id = id;
-        el.type = 'hidden';
-        el.value = JSON.stringify(message);
-        document.body.insertAdjacentElement('beforeend', el);
-    },
-
-    // send message to DOM to contentScript
-    send: async function(event, message, reply) {
-        this.writeDomMessage('extension-message-sent', { event: event, message: message });
-
-        const response = await this.watchDomMessage('extension-message-sent-reply');
-
-        if (reply){
-            reply(response);
-        }
-    },
-};
-messageBus.watch();
+import Request from "./helpers/request.js";
+import Message from "./helpers/messageDom.js";
 
 const network = {
     list: [
@@ -93,13 +37,12 @@ const network = {
                 }
                 // send a message to contentScript so it knows when network changed
                 if (oldNetwork) {
-                    messageBus.send('network', { network: this.selected.name });
+                    new Message('network').send({ network: this.selected.name });
                 }
             }
         }, 100);
     },
 };
-network.changeWatcher();
 
 
 const owlracle = {
@@ -163,7 +106,7 @@ const owlracle = {
         }
 
         this.args.apikey = this.apiKey;
-        const res = await new Request({ url: this.url }).get(`${ ntw.name }/gas`, this.args);
+        const res = await new Request().get(`${ ntw.name }/gas`, this.args);
 
         if (res.error) {
             return res;
@@ -188,14 +131,14 @@ const owlracle = {
 }
 
 if (window.ethereum) {
-    // console.log(window.ethereum)
+    network.changeWatcher();
 
     const requestOverride = ethereum => {
         // console.log(ethereum)
         
         // Metamask expose window.ethereum.
         // All contract interactions go through window.ethereum.request
-        // I replace the old request method for one calling the old requests, but replcing the gasPrice argument
+        // I replace the old request method for one calling the old requests, but replacing the gasPrice argument
         const oldReq = ethereum.request;
         ethereum.request = async ({method, params}) => {
             let change = false;
@@ -228,7 +171,7 @@ if (window.ethereum) {
 
                 // background will listen to this and create a notification
                 if (gas && owlracle.notifications){
-                    messageBus.send('notification-gas', { gas: gas });
+                    new Message('notification-gas').send({ gas: gas });
                 }
             }
             // console.log(params);`
@@ -243,8 +186,8 @@ if (window.ethereum) {
     };
 
     requestOverride(window.ethereum);
-
-    messageBus.addEvent('advisor', message => {
+    
+    new Message('advisor').listen(message => {
         if (!owlracle.apiKey && message.apiKey) {
             console.log(`🦉 You are taking Owlracle's advice for gas price settings on your Metamask transactions 🦉`);
             console.log(`🦉 Check our website ${owlracle.url} or get in touch at ${owlracle.url}/discord-support 🦉`);
@@ -262,7 +205,7 @@ if (window.ethereum) {
     });
 
     // send back network to popup
-    messageBus.addEvent('get-network', () => {
+    new Message('get-network').listen(() => {
         return network.get().name;
     });
 }

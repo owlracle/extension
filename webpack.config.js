@@ -6,6 +6,9 @@ import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 export default {
     entry: {
         popup: './src/js/popup.js',
+        contentScript: './src/js/contentScript.js',
+        inject: './src/js/inject.js',
+        background: './src/js/background.js',
     },
     output: {
         filename: '[name].min.js',

@@ -71,10 +71,18 @@ advisor.updateDOM(true);
 
 // route messages from inject to popup
 new MessageDOM([
-    'notification-gas',
     'network',
 ]).listen(async (message, channel) => {
+    // console.log('listener', message, channel);
     new Message(channel).send(message);
+});
+
+// route messages from inject to background
+new MessageDOM([
+    'notification-gas',
+]).listen(async (message, channel) => {
+    // console.log('listener', message, channel);
+    new Message(channel, true).send(message);
 });
 
 // route messages from popup to inject

@@ -126,7 +126,7 @@ const advisor = {
 
         // request network to inject (when popup open)
         new Message('get-network').send({} , async message => {
-            console.log('message received', message);
+            // console.log('message received', message);
             if (!message) {
                 container.querySelector('#network-container #network').innerHTML = `<b class="red">Unsupported network</b>`;
                 this.network = false;

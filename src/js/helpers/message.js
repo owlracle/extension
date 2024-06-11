@@ -2,8 +2,9 @@ export default class Message {
     static events = {};
     static watching = false;
 
-    constructor(channels = []) {
+    constructor(channels = [], background = false) {
         this.channels = Array.isArray(channels) ? channels : [channels];
+        this.background = background;
 
         if (!Message.watching) {
             Message.watchFromPopup();
@@ -13,6 +14,7 @@ export default class Message {
 
     static watchFromPopup() {
         chrome.runtime.onMessage.addListener((message, sender, reply) => {
+            // console.log('message from popup', message);
             if (message.channel && Message.events[message.channel]) {
                 Message.events[message.channel](message.message, message.channel).then(response => {
                     // console.log('replyMsg from popup', message, response, Object.keys(Message.events));
@@ -41,9 +43,9 @@ export default class Message {
         reply(replyList);
     }
 
-    async sendToPopup(channel, message, background = false) {
+    async sendToPopup(channel, message) {
         // console.log('sendToPopup', channel, message, background)
-        if (background) {
+        if (this.background) {
             return new Promise(async resolve => {
                 const response = await chrome.runtime.sendMessage({ channel, message });
                 // console.log('response from popup 1', response)
@@ -52,6 +54,7 @@ export default class Message {
         }
 
         return new Promise(async resolve => {
+            if (!chrome.tabs) return resolve(null);
             const tabs = await chrome.tabs.query({active: true, currentWindow: true});
             const response = await chrome.tabs.sendMessage(tabs[0].id, { channel, message });
             // console.log('response from popup 2', response);

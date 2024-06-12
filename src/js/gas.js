@@ -61,6 +61,8 @@ const gasTimer = {
             container.insertAdjacentHTML('beforeend', dom);
         });
 
+        this.beforeUpdate();
+
         const buttonContainer = document.createElement('div');
         buttonContainer.classList.add('button-container');
         container.appendChild(buttonContainer);
@@ -128,14 +130,19 @@ const gasTimer = {
             // console.log(data)
             this.onUpdate(data);
         }
+
+        document.querySelectorAll('.gas').forEach(e => e.classList.remove('loading'));
         return data;
     }
 };
 
 gasTimer.beforeUpdate = () => {
-    document.querySelectorAll('.gas .body').forEach((e, i) => {
-        e.querySelector('.gwei').innerHTML = `<i class="fas fa-spin fa-cog"></i>`;
-        e.querySelector('.usd').innerHTML = ``;
+    document.querySelectorAll('.gas').forEach((e, i) => {
+        e.classList.add('loading');
+        e.querySelector('.gwei').innerHTML = `00.000 GWei`;
+        e.querySelector('.usd').innerHTML = `$ 00.0000`;
+        e.querySelector('.base').innerHTML = 'Base: 00.00 GWei';
+        e.querySelector('.tip').innerHTML = 'Tip: 00.00 GWei';
     });
 }
 

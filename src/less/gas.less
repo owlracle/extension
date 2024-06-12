@@ -30,11 +30,15 @@
             flex: 1;
             gap: 5px;
             
+            div {
+                transition: background-color 0.5s ease-out;
+            }
+
             .name {
                 font-size: 1.3rem;
                 margin-bottom: 10px;
-            }
-
+                }
+                
             .gwei {
                 font-weight: bold;
                 font-size: 1.2rem;
@@ -50,6 +54,28 @@
             }
 
         }
+
+        &.loading {
+            .gwei, .usd, .base, .tip {
+                border-radius: 3px;
+                background-color: var(--text-color);
+                opacity: 0.2;
+                animation: fade 0.6s ease-in-out infinite;
+                color: transparent;
+                
+                @keyframes fade {
+                    0% {
+                        opacity: 0.2;
+                    }
+                    50% {
+                        opacity: 0.4;
+                    }
+                    100% {
+                        opacity: 0.2;
+                    }
+                }
+            }
+        }
     }
 
     .button-container {
@@ -59,10 +85,11 @@
         gap: 10px;
         margin-top: 10px;
         width: 100%;
-
+        
         button {
+            font-size: 0.8rem;
             width: 50%;
-            padding: 10px;
+            padding: 7px;
         }
     }
 }

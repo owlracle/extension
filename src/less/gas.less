@@ -17,9 +17,34 @@
         box-shadow: 0px 0px 15px #74747424;
         margin: 5px 0;
         gap: 10px;
+        height: 90px;
+        box-sizing: border-box;
 
         &:hover {
             background-color: var(--bg-color);
+        }
+
+        &.custom {
+            flex-direction: column;
+
+            .label {
+
+                .name {
+                    font-size: 1.3rem;
+                    color: var(--text-intense-color);
+                }
+    
+                .percent {
+                    font-size: 1.1rem;
+                    font-weight: bold;
+                    color: var(--text-intense-color);
+                }
+            }
+
+            .bar {
+                margin: 0 20px 5px 20px;
+            }
+
         }
 
         .col {

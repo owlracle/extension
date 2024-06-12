@@ -6,6 +6,7 @@ import login from './helpers/login.js';
 import Button from './components/button.js';
 import ModalMenu from './components/modalMenu.js';
 import storage from './helpers/storage.js';
+import InputRange from './components/inputRange.js';
 
 const gasTimer = {
     speeds: [
@@ -46,10 +47,10 @@ const gasTimer = {
         const container = document.querySelector('#content #gas');
         container.innerHTML = '';
 
-        this.cards.forEach(card => {
+        for (let i = 0; i < this.cards.length; i++) {
             const dom = `<div class="gas">
                 <div class="col">
-                    <div class="name">${this.speeds.find(s => s.accept == card).name}</div>
+                    <div class="name"></div>
                     <div class="usd"></div>
                 </div>
                 <div class="col">
@@ -59,6 +60,16 @@ const gasTimer = {
                 </div>
             </div>`;
             container.insertAdjacentHTML('beforeend', dom);
+        };
+
+        // update cards from storage as soon as possible
+        storage.get('gas-cards').then(cards => {
+            if (cards) {
+                this.cards = cards;
+                container.querySelectorAll('.gas').forEach((e, i) => {
+                    e.querySelector('.name').innerHTML = this.speeds.find(s => s.accept == this.cards[i]).name;
+                });
+            }
         });
 
         this.beforeUpdate();
@@ -68,7 +79,15 @@ const gasTimer = {
         container.appendChild(buttonContainer);
 
         new Button('Customize Speeds').click(async () => {
-            // new Dropdown();
+            if (!this.customizing) {
+                this.customizing = true;
+                this.customizeSpeeds();
+            }
+            else {
+                this.customizing = false;
+                this.init();
+                this.update();
+            }
         }).append(buttonContainer);
 
         new Button('Customize Fee').click(() => {
@@ -92,6 +111,7 @@ const gasTimer = {
         this.beforeUpdate();
 
         this.gasChosen = await storage.get('gas-used') || this.gasUsed[0].gas;
+        this.cards = await storage.get('gas-cards') || this.cards;
 
         let query = {
             accept: this.cards.join(','),
@@ -133,6 +153,31 @@ const gasTimer = {
 
         document.querySelectorAll('.gas').forEach(e => e.classList.remove('loading'));
         return data;
+    },
+
+    customizeSpeeds: async function () {
+        document.querySelectorAll('.gas').forEach((e, i) => {
+            const input = document.createElement('input');
+            input.type = 'range';
+            input.max = this.speeds[0].accept;
+            input.min = this.speeds[this.speeds.length - 1].accept;
+            input.value = this.cards[i];
+            input.step = 5;
+            input.id = `range-custom-${i}`;
+            
+            const selectedSpeed = this.speeds.find(s => s.accept == input.value);
+            e.innerHTML = `<div class="label"><span class="name">${selectedSpeed.name}</span>: Accepted on <span class="percent">${selectedSpeed.accept}%</span> of blocks</div>`;
+            e.appendChild(input);
+            e.classList.add('custom');
+
+            new InputRange(input).change(async value => {
+                const selectedSpeed = this.speeds.find(s => s.accept == value);
+                e.querySelector('.label .name').innerHTML = selectedSpeed.name;
+                e.querySelector('.label .percent').innerHTML = selectedSpeed.accept + '%';
+                this.cards[i] = value;
+                storage.set('gas-cards', this.cards);
+            })
+        });
     }
 };
 
@@ -166,6 +211,7 @@ gasTimer.onUpdate = data => {
     }
     
     document.querySelectorAll('.gas').forEach((e, i) => {
+        e.querySelector('.name').innerHTML = gasTimer.speeds.find(s => s.accept == gasTimer.cards[i]).name;
         e.querySelector('.gwei').innerHTML = `${info.gas[i]} GWei`;
         e.querySelector('.usd').innerHTML = `$ ${info.fee[i]}`;
 

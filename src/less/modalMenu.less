@@ -1,7 +1,7 @@
 #fog {
     align-items: flex-start;
 
-    #dropdown {
+    #modal-menu {
         border-radius: 0 0 3px 3px;
         display: flex;
         flex-wrap: wrap;
@@ -14,6 +14,9 @@
         justify-content: center;
         align-items: center;
         background-color: #223a4be7;
+        gap: 10px;
+        padding: 10px;
+        box-sizing: border-box;
         
         .item {
             box-sizing: border-box;
@@ -31,13 +34,19 @@
             justify-content: center;
             gap: 5px;
             background-color: #3f789edb;
-            margin: 0 5px;
             padding: 5px 0;
             border-radius: 3px;
+            text-align: center;
             
+            &.active {
+                background-color: #175d8b;
+                border: 1px solid #3498db;
+            }
+
             &:hover {
                 background-color: #3b8bc0;
             }
+
 
             .icon {
                 height: 20px;

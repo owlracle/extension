@@ -1,0 +1,38 @@
+button, .button {
+    outline: none;
+    border-radius: 3px;
+    border: 2px solid var(--border-color);
+    background-color: var(--bg-intense-color);
+    color: var(--text-color);
+    cursor: pointer;
+    transition: 0.3s all;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    box-shadow: 0px 0px 15px #74747424;
+    padding: 10px 15px;
+    box-sizing: border-box;
+    
+    &:hover {
+        background-color: var(--bg-color);
+    }
+
+    &.active {
+        background-color: var(--text-color);
+        color: var(--bg-intense-color);
+    }
+
+    img {
+        height: 20px;
+        width: 20px;
+        margin-right: 5px;
+    }
+
+    i {
+        margin-right: 10px;
+    }
+} 

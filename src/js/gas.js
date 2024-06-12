@@ -18,12 +18,14 @@ const gasTimer = {
 
         this.cards.forEach(card => {
             const dom = `<div class="gas">
-                <div class="title">
-                    <div class="left">${card.name}</div>
-                </div>
-                <div class="body">
-                    <div class="gwei"><i class="fas fa-spin fa-cog"></i></div>
+                <div class="col">
+                    <div class="name">${this.speeds.find(s => s.accept == card).name}</div>
                     <div class="usd"></div>
+                </div>
+                <div class="col">
+                    <div class="gwei"></div>
+                    <div class="base"></div>
+                    <div class="tip"></div>
                 </div>
             </div>`;
             container.insertAdjacentHTML('beforeend', dom);
@@ -53,6 +55,7 @@ const gasTimer = {
         }
 
         const data = await new Request().get(`${ (await new Network().get()).symbol }/gas`, query);
+        // console.log(data)
 
         if (data.error && data.status == 403) {
             console.log(data);
@@ -81,14 +84,36 @@ gasTimer.beforeUpdate = () => {
 }
 
 gasTimer.onUpdate = data => {
-    const gas = data.speeds.map(s => s.gasPrice.toFixed(s.gasPrice == parseInt(s.gasPrice) ? 0 : 2));
-    const fee = data.speeds.map(s => s.estimatedFee.toFixed(4));
+    // console.log(data);
+    if (!data.speeds) return;
+    
+    const typeGas = data.speeds.find(s => s.maxFeePerGas === undefined) ? 1 : 2;
+    const info = {};
+    info.gas = (() => {
+        let gas = data.speeds.map(s => s.gasPrice || s.maxFeePerGas);
+        gas = gas.map(g => g.toFixed(g == parseInt(g) ? 0 : Math.max(2, 1 + Math.ceil(Math.abs(Math.log10(g))))));
+        gas = gas.map(g => g > 9999 ? parseInt(g) : g);
+        return gas;
+    })();
+    info.fee = data.speeds.map(s => s.estimatedFee.toFixed(4));
 
-    document.querySelectorAll('.gas .body').forEach((e, i) => {
-        if (data.speeds) {
-            e.querySelector('.gwei').innerHTML = `${gas[i]} GWei`;
-            e.querySelector('.usd').innerHTML = `$ ${fee[i]}`;
+    if (typeGas == 2) {
+        info.base = data.speeds.map(s => s.baseFee.toFixed(2));
+        info.tip = data.speeds.map(s => s.maxPriorityFeePerGas.toFixed(2));
+    }
+    
+    document.querySelectorAll('.gas').forEach((e, i) => {
+        e.querySelector('.gwei').innerHTML = `${info.gas[i]} GWei`;
+        e.querySelector('.usd').innerHTML = `$ ${info.fee[i]}`;
+
+        let base = '';
+        let tip = '';
+        if (typeGas == 2) {
+            base = `Base: ${info.base[i]} GWei`;
+            tip = `Tip: ${info.tip[i]} GWei`;
         }
+        e.querySelector('.base').innerHTML = base;
+        e.querySelector('.tip').innerHTML = tip;
     });
 };
 

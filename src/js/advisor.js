@@ -4,6 +4,7 @@ import storage from './helpers/storage.js';
 import ModalWindow from './components/modal.js';
 import Message from './helpers/message.js';
 import login from './helpers/login.js';
+import InputRange from './components/inputRange.js';
 
 // advisor config and methods
 const advisor = {
@@ -76,7 +77,14 @@ const advisor = {
             <a href="${this.website}/discord-support" target="_blank">Found a bug? Please report.</a>
         </div>`;
 
-        container.querySelectorAll('input.range').forEach(e => createInputRange(e));
+        container.querySelectorAll('input.range').forEach(e => {
+            const input = new InputRange(e);
+            input.change(value => {
+                advisor.speed = value;
+                advisor.set({ speed: value });
+                advisor.setCost();
+            })
+        });
 
         // click the allow button to to start receiving advices
         const allowCheck = container.querySelector('label #allow');
@@ -186,65 +194,5 @@ const advisor = {
         valueBox.innerHTML = `$${ parseFloat(data.advice.fee).toFixed(4) }`;
     }
 };
-
-function createInputRange(elem) {
-    const size = Array.from(document.querySelectorAll('.range-custom')).length;
-    elem.id = `input-range-${size}`;
-    elem.insertAdjacentHTML('afterend', `
-        <div id="range-custom-${size}" class="range-custom">
-            <div class="bar">
-                <div class="filled"></div>
-                <div class="thumb"></div>
-            </div>
-        </div>
-    `);
-    elem.setAttribute('hidden', true);
-
-    const speedContainer = document.querySelector('#content #advisor #speed-container')
-    const range = document.querySelector(`#range-custom-${size}`);
-    const thumb = range.querySelector(`.thumb`);
-    const filled = range.querySelector(`.filled`);
-
-    const moveRange = (e, ignoreButton) => {
-        if (speedContainer.classList.contains('disabled')) {
-            return;
-        }
-
-        // enter when clicking or dragging
-        if (e && e.buttons === 1 || ignoreButton) {
-            const pos = e.offsetX / range.offsetWidth;
-            elem.value = (parseInt(elem.max) - parseInt(elem.min)) * pos + parseInt(elem.min);
-        }
-
-        // enter normally, or at the start (!e)
-        if (!e || (e.buttons === 1 || ignoreButton)) {
-            thumb.innerHTML = elem.value;
-            // recalc after setting value, because input step
-            const newPos = (elem.value - parseInt(elem.min)) / (parseInt(elem.max) - parseInt(elem.min)) * 100;
-            filled.style['width'] = `${ newPos }%`;
-    
-            const r = 200 - ((elem.value - parseInt(elem.min)) / (parseInt(elem.max) - parseInt(elem.min)) * 97);
-            const g = (elem.value - parseInt(elem.min)) / (parseInt(elem.max) - parseInt(elem.min)) * 71 + 90;
-            filled.style['background-color'] = `rgb(${r},${g},64)`;
-        }
-    };
-    moveRange();
-    range.addEventListener('mousemove', e => moveRange(e));
-    range.addEventListener('click', e => moveRange(e, true));
-
-    // set speed when done dragging
-    range.addEventListener('mouseup', () => {
-        if (speedContainer.classList.contains('disabled')) {
-            return;
-        }
-
-        // wait a little time for elem.value update
-        setTimeout(() => {
-            advisor.speed = elem.value;
-            advisor.set({ speed: elem.value });
-            advisor.setCost();
-        }, 100);
-    });
-}
 
 export default advisor;

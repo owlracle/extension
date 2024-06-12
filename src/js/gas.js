@@ -3,14 +3,44 @@ import Network from './helpers/network.js';
 import ModalWindow from './components/modal.js';
 import menu from './components/menu.js';
 import login from './helpers/login.js';
+import Button from './components/button.js';
+import ModalMenu from './components/modalMenu.js';
+import storage from './helpers/storage.js';
 
 const gasTimer = {
-    cards: [ // preferences for cards
-        { name: '🛴Slow', accept: 35 },
-        { name: '🚗Standard', accept: 60 },
-        { name: '✈️Fast', accept: 90 },
-        { name: '🚀Instant', accept: 100 },
+    speeds: [
+        { name: '🛸 Instant', accept: 100 },
+        { name: '🚀 Instant', accept: 95 },
+        { name: '✈️ Fast', accept: 90 },
+        { name: '🚅 Fast', accept: 85 },
+        { name: '🏎️ Fast', accept: 80 },
+        { name: '🚓 Fast', accept: 75 },
+        { name: '🚗 Fast', accept: 70 },
+        { name: '🏍️ Standard', accept: 65 },
+        { name: '🛵 Standard', accept: 60 },
+        { name: '🚂 Standard', accept: 55 },
+        { name: '🚤 Standard', accept: 50 },
+        { name: '⛵ Standard', accept: 45 },
+        { name: '🚲 Slow', accept: 40 },
+        { name: '🚜 Slow', accept: 35 },
+        { name: '🛴 Slow', accept: 30 },
+        { name: '🏃‍♂️ Slow', accept: 25 },
+        { name: '🚶‍♂️ Slow', accept: 20 },
     ],
+
+    cards: [100, 90, 60, 35],
+
+    gasUsed: [
+        { name: "Uniswap V3: Swap", gas: 184523 },
+        { name: "Standard Transfer", gas: 21000 },
+        { name: "ERC20: Transfer", gas: 65000 },
+        { name: "Multichain: Bridge", gas: 57887 },
+        { name: "OpenSea: Sale", gas: 71645 },
+        { name: "Aave: Borrow", gas: 318788 },
+        { name: "ENS: Register Domain", gas: 266996 },
+    ],
+
+    gasChosen: 0,
 
     init: function () {
         const container = document.querySelector('#content #gas');
@@ -30,15 +60,41 @@ const gasTimer = {
             </div>`;
             container.insertAdjacentHTML('beforeend', dom);
         });
+
+        const buttonContainer = document.createElement('div');
+        buttonContainer.classList.add('button-container');
+        container.appendChild(buttonContainer);
+
+        new Button('Customize Speeds').click(async () => {
+            // new Dropdown();
+        }).append(buttonContainer);
+
+        new Button('Customize Fee').click(() => {
+            new ModalMenu(
+                this.gasUsed.map(gas => ({
+                    text: gas.name,
+                    action: () => {
+                        this.gasChosen = gas.gas;
+                        storage.set('gas-used', gas.gas);
+                        this.update();
+                    },
+                    customClass: gas.gas == this.gasChosen ? 'active' : null,
+                })),
+                {customClass: 'gas-used'},
+            );
+        }).append(buttonContainer);
+
     },
 
     update: async function () {
         this.beforeUpdate();
 
+        this.gasChosen = await storage.get('gas-used') || this.gasUsed[0].gas;
+
         let query = {
-            accept: this.cards.map(e => e.accept).join(','),
+            accept: this.cards.join(','),
             source: 'extension',
-            eip1559: false,
+            gasused: this.gasChosen,
         };
 
         const ak = await login.get('apikey');

@@ -4,7 +4,7 @@ import api from './api.js';
 import advisor from './advisor.js';
 import login from './helpers/login.js';
 import Network from './helpers/network.js';
-import Dropdown from './components/dropdown.js';
+import ModalMenu from './components/modalMenu.js';
 import menu from './components/menu.js';
 import Message from './helpers/message.js';
 
@@ -51,13 +51,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     
         bindClick: async function() {
             // network button action
-            new Dropdown({
-                button: this.element,
-                itemList: Object.values(await Network.getList()).map(e => ({ id: e.symbol, innerHTML: `<img class="icon" src="${website}/img/${e.symbol}.png" alt="${e.name} icon"><span class="name">${e.name}</span>` })),
-                clickFn: e => {
-                    new Network().set(e.id);
-                    this.reload();
-                },
+            this.element.addEventListener('click', async () => {
+                const networkList = Object.values(await Network.getList());
+                new ModalMenu(networkList.map(network => ({
+                    id: network.symbol,
+                    image: `${website}/img/${network.symbol}.png`,
+                    text: network.name,
+                    action: item => {
+                        new Network().set(item.id);
+                        this.reload();
+                    }
+                })));
             });
         }
     };

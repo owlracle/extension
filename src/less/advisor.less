@@ -141,6 +141,8 @@
 
         #speed-container {
             width: 100%;
+            padding: 0 10px;
+            box-sizing: border-box;
 
             &.disabled .range-custom {
                 .filled {
@@ -150,12 +152,16 @@
                 .thumb {
                     color: transparent;
                 }
-            }    
+            }
 
             #label-container {
                 display: grid;
                 grid-template-columns: 25fr 25fr 10fr 0fr;
-                margin-bottom: -5px;
+                margin: 0 -10px;
+            }
+
+            .range-custom {
+                margin: 15px 0;
             }
             
         }

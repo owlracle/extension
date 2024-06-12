@@ -78,8 +78,8 @@ const advisor = {
         </div>`;
 
         container.querySelectorAll('input.range').forEach(e => {
-            const input = new InputRange(e);
-            input.change(value => {
+            this.speedInput = new InputRange(e);
+            this.speedInput.change(value => {
                 advisor.speed = value;
                 advisor.set({ speed: value });
                 advisor.setCost();
@@ -161,13 +161,14 @@ const advisor = {
 
         container.querySelectorAll('.require-allow').forEach(e => e.classList.remove('disabled'));
         container.querySelector('label #notifications').removeAttribute('disabled');
-        
+        this.speedInput.enable();
+
         const advisorEnabled = (await this.get('enabled')).enabled;
         if (!this.network || !advisorEnabled) {
+            this.speedInput.disable();
             container.querySelectorAll('.require-allow').forEach(e => e.classList.add('disabled'));
             container.querySelector('label #notifications').setAttribute('disabled', true);
             valueBox.innerHTML = 'N/A';
-
             return;
         }
 

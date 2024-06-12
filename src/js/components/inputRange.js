@@ -16,6 +16,7 @@ export default class InputRange {
         elem.setAttribute('hidden', true);
 
         const range = document.querySelector(`#range-custom-${size}`);
+        this.range = range;
         const thumb = range.querySelector(`.thumb`);
         const filled = range.querySelector(`.filled`);
 
@@ -23,7 +24,6 @@ export default class InputRange {
             if (this.disabled) return;
 
             // enter when clicking or dragging
-            console.log(e, range.getBoundingClientRect());
             if (e && e.buttons === 1 || ignoreButton) {
                 const pos = (e.clientX - range.getBoundingClientRect().left) / range.offsetWidth;
                 elem.value = (parseInt(elem.max) - parseInt(elem.min)) * pos + parseInt(elem.min);
@@ -60,5 +60,11 @@ export default class InputRange {
 
     disable() {
         this.disabled = true;
+        this.range.classList.add('disabled');
+    }
+
+    enable() {
+        this.disabled = false;
+        this.range.classList.remove('disabled');
     }
 }

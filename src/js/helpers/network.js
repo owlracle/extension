@@ -29,6 +29,11 @@ export default class Network {
             this.network = (await storage.get('network')) || 'eth';
         }
 
+        if (!isNaN(this.network)) {
+            const rpc = await new Request().get(`${this.network}/rpc`);
+            this.network = rpc.network;
+        }
+
         return (await Network.getList())[this.network];
     }
 

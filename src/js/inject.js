@@ -2,22 +2,9 @@ import Request from "./helpers/request.js";
 import Message from "./helpers/messageDom.js";
 
 const network = {
-    list: [
-        { name: 'eth', id: 1 },
-        { name: 'bsc', id: 56 },
-        { name: 'poly', id: 137 },
-        { name: 'ftm', id: 250 },
-        { name: 'avax', id: 43114 },
-        { name: 'cro', id: 25 },
-        { name: 'movr', id: 1285 },
-        { name: 'one', id: 166660000 },
-        { name: 'ht', id: 128 },
-        { name: 'celo', id: 42220 },
-        { name: 'fuse', id: 122 },
-    ],
-
     get: function() {
-        this.selected = this.list.find(e => e.id == parseInt(window.ethereum.networkVersion));
+        if (!window.ethereum) return null;
+        this.selected = parseInt(window.ethereum.networkVersion);
         return this.selected;
     },
 
@@ -37,10 +24,10 @@ const network = {
                 }
                 // send a message to contentScript so it knows when network changed
                 if (oldNetwork) {
-                    new Message('network').send({ network: this.selected.name });
+                    new Message('network').send({ network: this.selected });
                 }
             }
-        }, 100);
+        }, 1000);
     },
 };
 
@@ -106,7 +93,7 @@ const owlracle = {
         }
 
         this.args.apikey = this.apiKey;
-        const res = await new Request().get(`${ ntw.name }/gas`, this.args);
+        const res = await new Request().get(`${ ntw }/gas`, this.args);
 
         if (res.error) {
             return res;

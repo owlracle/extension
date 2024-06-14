@@ -30,39 +30,52 @@ export default class MessageDOM {
     }
 
     static async watchDOMMessage(id) {
-        return new Promise(resolve => {
-            const checkInt = setInterval( () => {
-                const extMessageContainer = document.querySelectorAll('#'+ id);
-                if (!extMessageContainer) return;
-                    
-                for (let i in extMessageContainer) {
-                    try {
-                        const extMessage = JSON.parse(extMessageContainer[i].value);
-                        if (!extMessage) continue;
-                        clearInterval(checkInt);
-                        resolve(extMessage);
-                    }
-                    catch(err) {
-                        continue;
-                    }
+
+        function getDOMMessage(id) {
+            const extMessageContainer = document.querySelector('#'+ id);
+            // console.log('extMessageContainer:', extMessageContainer);
+            if (!extMessageContainer || !extMessageContainer.value) return null;
+
+            try {
+                const extMessage = JSON.parse(extMessageContainer.value);
+                // console.log('extMessage:', extMessage, id)
+                return extMessage;
+            }
+            catch(err) {
+                return null;
+            }
+        }
+
+        const response = await new Promise(resolve => {
+            const interval = setInterval(() => {
+                const extMessage = getDOMMessage(id);
+                // console.log('extMessage:', extMessage, id)
+                if (extMessage !== null) {
+                    clearInterval(interval);
+                    resolve(extMessage);
                 }
-            }, 100);
+            }, 100)
         });
+        // console.log('response from dom:', response);
+        return response;
     }
 
     static removeDOMMessage(id) {
-        const extMessageContainer = document.querySelectorAll('#'+ id);
+        const extMessageContainer = document.querySelector('#'+ id);
         if (extMessageContainer) {
-            extMessageContainer.forEach(el => el.remove());
+            extMessageContainer.remove();
         }
     }
 
     static writeDOMMessage(id, message) {
+        if (message == null) return;
+        message = JSON.stringify(message);
+
         // insert message into DOM
         const el = document.createElement('input');
         el.id = id;
         el.type = 'hidden';
-        el.value = JSON.stringify(message);
+        el.value = message;
         document.body.insertAdjacentElement('beforeend', el);
     }
 
@@ -85,14 +98,14 @@ export default class MessageDOM {
     }
 
     async sendToInject(channel, message) {
-        const id = Math.random().toString(36).substr(2, 9);
+        const id = Math.random().toString(36).slice(2, 10);
         MessageDOM.writeDOMMessage(MessageDOM.domId, { id, channel, message });
         // console.log('message sent to inject:', { id, channel, message });
         // watch for reply from inject
         const messageId = `${MessageDOM.domId}-reply-${id}`;
         const replyMessage = await MessageDOM.watchDOMMessage(messageId);
-        // console.log('reply from inject:', replyMessage)
-        if (replyMessage) {
+        // console.log('reply from inject:', replyMessage);
+        if (replyMessage !== null) {
             MessageDOM.removeDOMMessage(messageId);
         }
 

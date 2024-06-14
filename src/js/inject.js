@@ -203,12 +203,13 @@ if (window.ethereum) {
 
         return true;
     });
-
-    // send back network to popup
-    new Message('get-network').listen(() => {
-        return network.get().name;
-    });
 }
 else {
     console.log('Metamask not detected');
 }
+
+// send back network to popup
+new Message('get-network').listen(() => {
+    // console.log('message received', network.get());
+    return network.get() || false;
+});

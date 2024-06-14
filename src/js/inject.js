@@ -100,11 +100,11 @@ const owlracle = {
         }
 
         const speedInfo = res.speeds[this.speed];
-        if (speedInfo && speedInfo.gasPrice) {
-            if (res.baseFee) {
+        if (speedInfo && (speedInfo.gasPrice || speedInfo.baseFee)) {
+            if (speedInfo.baseFee) {
                 gasPrice = {
-                    maxFeePerGas: speedInfo.gasPrice,
-                    maxPriorityFeePerGas: Math.max(speedInfo.gasPrice - res.baseFee, 0),
+                    maxFeePerGas: speedInfo.maxFeePerGas,
+                    maxPriorityFeePerGas: speedInfo.maxPriorityFeePerGas,
                 };
             }
             else {
@@ -143,22 +143,23 @@ if (window.ethereum) {
                 }
                 else if (gas.gasPrice) {
                     console.log(`🦉 Owlracle suggests: ${ gas.gasPrice } GWei`);
-                    params[0].gasPrice = '0x'+ parseInt(gas.gasPrice * 1000000000).toString(16);
+                    params[0].gasPrice = '0x'+ parseInt(gas.gasPrice * 1e9).toString(16);
                     delete params[0].maxFeePerGas;
                     delete params[0].maxPriorityFeePerGas;
                 }
                 else if (gas.maxFeePerGas) {
                     console.log(`🦉 Owlracle suggests:`);
                     Object.entries(gas).forEach(([k,v]) => {
-                        params[0][k] = '0x'+ parseInt(v * 1000000000).toString(16)
+                        params[0][k] = '0x'+ parseInt(v * 1e9).toString(16)
                         console.log(`${k}: ${v} GWei`);
                     });
                     delete params[0].gasPrice;
                 }
+                // console.log(params);
 
                 // background will listen to this and create a notification
                 if (gas && owlracle.notifications){
-                    new Message('notification-gas').send({ gas: gas });
+                    new Message('notification-gas').send({ gas });
                 }
             }
             // console.log(params);`

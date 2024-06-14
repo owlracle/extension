@@ -11,42 +11,14 @@
         margin-bottom: 10px;
         width: 100%;
         padding: 0 10px;
+        gap: 15px;
     }
 
     #style-switcher, #timeframe-switcher {
-        display: flex;
+        flex-grow: 1;
 
         button {
-            border: 0;
-            outline: none;
-            border-radius: 3px;
-            border: 2px solid var(--border-color);
-            background-color: var(--bg-intense-color);
-            color: var(--text-color);
-            cursor: pointer;
-            transition: 0.3s all;
-            width: 140px;
-            height: 35px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: 'Roboto', sans-serif;
-            font-size: 1rem;
-            
-            &:hover {
-                background-color: var(--bg-color);
-            }
-
-            &.active {
-                background-color: var(--text-color);
-                color: var(--bg-intense-color);
-            }
-
-            img {
-                height: 20px;
-                width: 20px;
-                margin-right: 5px;
-            }
+            width: 100%;
         }
     }
 

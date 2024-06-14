@@ -3,9 +3,10 @@ import Request from './helpers/request.js';
 import Network from './helpers/network.js';
 import storage from './helpers/storage.js';
 import ModalWindow from './components/modal.js';
-import Dropdown from './components/dropdown.js';
 import menu from './components/menu.js';
 import login from './helpers/login.js';
+import Button from './components/button.js';
+import ModalMenu from './components/modalMenu.js';
 
 
 // create price chart
@@ -13,8 +14,8 @@ export default {
     ready: false,
     timeframe: 60,
     page: 1,
-    candles: 1000,
-    lastCandle: (new Date().getTime() / 1000).toFixed(0),
+    candles: 100,
+    lastCandle: (Date.now() / 1000).toFixed(0),
     allRead: false,
     config: {
         area: {
@@ -60,8 +61,8 @@ export default {
 
         document.querySelector('#content #chart.item').innerHTML = `
                 <div class="row">
-                    <div id="timeframe-switcher"><button></button></div>
-                    <div id="style-switcher"><button><img></button></div>
+                    <div id="timeframe-switcher"></div>
+                    <div id="style-switcher"></div>
                 </div>
                 <div id="chart"><i class="fas fa-spin fa-cog"></i></div>
                 <div id="toggle-container">
@@ -110,7 +111,6 @@ export default {
 
         // set modality buttons behaviour
         document.querySelectorAll(`#content #chart.item #toggle-container button`).forEach(e => e.addEventListener('click', () => this.setMode(e.id)));
-        this.setMode('gas');
 
         const container = document.querySelector('#chart.item #chart');
         const toolTip = document.createElement('div');
@@ -121,52 +121,51 @@ export default {
         this.obj.subscribeCrosshairMove(param => {
             if (param.point === undefined || !param.time || param.point.x < 0 || param.point.x > container.clientWidth || param.point.y < 0 || param.point.y > container.clientHeight) {
                 toolTip.style.display = 'none';
+                return;
             }
-            else {
-                toolTip.style.display = 'block';
-
-                const visibleSerie = Object.keys(this.series).filter(e => this.series[e].visible)[0];
-                const price = param.seriesPrices.get(this.series[visibleSerie].series);
-                // console.log(price)
-                if (price && typeof price !== 'number') {
-                    toolTip.innerHTML = Object.entries(price).map(([key, value]) => {
-                        const name = key.charAt(0).toUpperCase() + key.slice(1);
-
-                        // trunc to max 4 decimal places
-                        if (value.toString().split('.').length >= 2 && value.toString().split('.')[1].length > 4) {
-                            value = value.toString().split('.');
-                            value = value[0] + '.' + value[1].slice(0, 4);
-                        }
-
-                        return `<div class="${key}"><span class="name">${name}</span>: ${value}</div>`;
-                    }).join('');
-
-                    const coordinateY = container.offsetTop + 10;
-                    const coordinateX = container.offsetLeft + 10;
-
-                    toolTip.style.left = `${coordinateX}px`;
-                    toolTip.style.top = `${coordinateY}px`;
-                }
-                else {
-                    toolTip.style.display = 'none';
-                }
+            
+            toolTip.style.display = 'block';
+            const visibleSerie = Object.keys(this.series).filter(e => this.series[e].visible)[0];
+            const price = param.seriesData.get(this.series[visibleSerie].series);
+            // console.log(price)
+            if (!price || typeof price === 'number') {
+                toolTip.style.display = 'none';
+                return;
             }
+
+            toolTip.innerHTML = Object.entries(price).map(([key, value]) => {
+                if (key == 'time') return;
+
+                const name = key.charAt(0).toUpperCase() + key.slice(1);
+
+                // trunc to max 4 decimal places
+                if (value.toString().split('.').length >= 2 && value.toString().split('.')[1].length > 4) {
+                    value = value.toString().split('.');
+                    value = value[0] + '.' + value[1].slice(0, 4);
+                }
+
+                return `<div class="${key}"><span class="name">${name}</span>: ${value}</div>`;
+            }).join('');
+
+            const coordinateY = container.offsetTop + 10;
+            const coordinateX = container.offsetLeft + 10;
+
+            toolTip.style.left = `${coordinateX}px`;
+            toolTip.style.top = `${coordinateY}px`;
         });
 
         // dropdown time frame switcher
-        new Dropdown({
-            button: document.querySelector('#content #chart.item #timeframe-switcher button'),
-            itemList: [
-                { id: 'tf-10', innerHTML: `<img class="icon" src="${this.imgCache['time-10'].src}">10 minutes` },
-                { id: 'tf-30', innerHTML: `<img class="icon" src="${this.imgCache['time-30'].src}">30 minutes` },
-                { id: 'tf-60', innerHTML: `<img class="icon" src="${this.imgCache['time-60'].src}">1 hour` },
-                { id: 'tf-120', innerHTML: `<img class="icon" src="${this.imgCache['time-120'].src}">2 hours` },
-                { id: 'tf-240', innerHTML: `<img class="icon" src="${this.imgCache['time-240'].src}">4 hours` },
-                { id: 'tf-1440', innerHTML: `<img class="icon" src="${this.imgCache['time-1440'].src}">1 day` },
-            ],
-            clickFn: b => this.timeframeSwitch(b.id.split('tf-')[1]),
-        });
-
+        this.btnTimeFrame = new Button().click(() => {
+            new ModalMenu([
+                { id: 'tf-10', image: this.imgCache['time-10'].src, text: `10 minutes`, action: () => this.timeframeSwitch('10') },
+                { id: 'tf-30', image: this.imgCache['time-30'].src, text: `30 minutes`, action: () => this.timeframeSwitch('30') },
+                { id: 'tf-60', image: this.imgCache['time-60'].src, text: `1 hour`, action: () => this.timeframeSwitch('60') },
+                { id: 'tf-120', image: this.imgCache['time-120'].src, text: `2 hours`, action: () => this.timeframeSwitch('120') },
+                { id: 'tf-240', image: this.imgCache['time-240'].src, text: `4 hours`, action: () => this.timeframeSwitch('240') },
+                { id: 'tf-1440', image: this.imgCache['time-1440'].src, text: `1 day`, action: () => this.timeframeSwitch('1440') },
+            ], { customClass: 'vertical' });
+        }).append(document.querySelector('#content #chart.item #timeframe-switcher'));
+        
         this.timeScale = this.obj.timeScale();
 
         this.timeScale.subscribeVisibleLogicalRangeChange(async () => {
@@ -190,44 +189,43 @@ export default {
 
 
         // set candle/area style buttons behaviour
-        new Dropdown({
-            button: document.querySelector('#content #chart.item #style-switcher button'),
-            itemList: [
-                { id: 'style-area', innerHTML: `<img class="icon" src="${this.imgCache['line-chart'].src}">Area` },
-                { id: 'style-candlestick', innerHTML: `<img class="icon" src="${this.imgCache['candle-chart'].src}">Candlestick` },
-            ],
-            clickFn: async b => {
-                if (this.queryHistory) {
-                    return;
-                }
+        this.btnStyleSwitcher = new Button().click(() => {
+            new ModalMenu([
+                { id: 'style-area', image: this.imgCache['line-chart'].src, text: `Area`, action: () => changeStyle('area') },
+                { id: 'style-candlestick', image: this.imgCache['candle-chart'].src, text: `Candlestick`, action: () => changeStyle('candlestick') },
+            ], {customClass: 'vertical'});
+        }).append(document.querySelector('#content #chart.item #style-switcher'));
 
-                const styleswitcher = document.querySelector('#content #chart.item #style-switcher button');
-                styleswitcher.innerHTML = `<i class="fas fa-spin fa-cog"></i>`;
-                const serie = this.series[this.mode];
-                const style = this.preferences[this.mode] = b.id.split('style-')[1];
-                serie.config = Object.assign({}, this.config[style]);
+        const changeStyle = async (styleMode) => {
+            if (this.queryHistory) return;
 
-                this.queryHistory = true;
-                const history = await this.getHistory(this.timeframe);
+            this.btnStyleSwitcher.setText(`<i class="fas fa-spin fa-cog"></i>`);
+            const serie = this.series[this.mode];
+            const style = this.preferences[this.mode] = styleMode;
+            serie.config = Object.assign({}, this.config[style]);
 
-                this.obj.removeSeries(serie.series);
-                serie.series = null;
+            this.queryHistory = true;
+            const history = await this.getHistory(this.timeframe);
 
-                this.update(history);
+            this.obj.removeSeries(serie.series);
+            serie.series = null;
 
-                serie.series.applyOptions({ visible: serie.visible });
+            this.update(history);
 
-                styleswitcher.innerHTML = `<img src="${this.imgCache[`${this.preferences[this.mode] == 'candlestick' ? 'candle' : 'line'}-chart`].src}">${this.preferences[this.mode][0].toUpperCase() + this.preferences[this.mode].slice(1)}`;
+            serie.series.applyOptions({ visible: serie.visible });
 
-                this.setCookie();
-                this.queryHistory = false;
-            }
-        });
+            this.btnStyleSwitcher.setText(`<img src="${this.imgCache[`${this.preferences[this.mode] == 'candlestick' ? 'candle' : 'line'}-chart`].src}">${this.preferences[this.mode][0].toUpperCase() + this.preferences[this.mode].slice(1)}`);
+
+            this.setCookie();
+            this.queryHistory = false;
+        }
 
         this.setTheme('dark');
         document.querySelector(`#content #chart.item #chart i`).remove();
 
         this.ready = true;
+
+        this.setMode('gas');
 
         return;
     },
@@ -243,7 +241,7 @@ export default {
                 series.visible = true;
                 this.mode = a.id;
 
-                document.querySelector(`#content #chart.item #style-switcher button`).innerHTML = `<img src="${this.imgCache[`${this.preferences[this.mode] == 'candlestick' ? 'candle' : 'line'}-chart`].src}">${this.preferences[this.mode][0].toUpperCase() + this.preferences[this.mode].slice(1)}`;
+                this.btnStyleSwitcher.setText(`<img src="${this.imgCache[`${this.preferences[this.mode] == 'candlestick' ? 'candle' : 'line'}-chart`].src}">${this.preferences[this.mode][0].toUpperCase() + this.preferences[this.mode].slice(1)}`);
             }
             else {
                 a.classList.remove('active');
@@ -257,6 +255,8 @@ export default {
     },
 
     timeframeSwitch: async function (time) {
+        const button = this.btnTimeFrame;
+
         if (!this.ready) {
             await this.init();
         }
@@ -271,9 +271,7 @@ export default {
             time = this.timeframe;
         }
 
-
-        const tfswitcher = document.querySelector('#content #chart.item #timeframe-switcher button');
-        tfswitcher.innerHTML = `<i class="fas fa-spin fa-cog"></i>`;
+        button.setText(`<i class="fas fa-spin fa-cog"></i>`);
 
         this.queryHistory = true;
         const history = await this.getHistory(time);
@@ -288,7 +286,7 @@ export default {
                 1440: '1 day',
             })[time];
         })(time);
-        tfswitcher.innerHTML = `<img src="${this.imgCache[`time-${time}`].src}">${text}`;
+        button.setText(`<img src="${this.imgCache[`time-${time}`].src}">${text}`);
 
         this.update(history);
         this.setCookie();
@@ -312,52 +310,53 @@ export default {
 
     update: function (data) {
         // console.log(data);
-        if (data.length) {
-            const seriesName = { gas: 'gasPrice', token: 'tokenPrice', fee: 'txFee' };
+        data = data.candles || [];
+        if (!data.length) return;
 
-            Object.entries(this.series).forEach(([key, value]) => {
-                const speedData = data.map(e => {
-                    if (value.config.style == 'candlestick') {
-                        return {
-                            // value: e[key].high,
-                            open: e[seriesName[key]].open,
-                            close: e[seriesName[key]].close,
-                            low: e[seriesName[key]].low,
-                            high: e[seriesName[key]].high,
-                            time: parseInt(new Date(e.timestamp).getTime() / 1000),
-                        }
-                    }
+        const seriesName = { gas: 'gasPrice', token: 'tokenPrice', fee: 'txFee' };
+
+        Object.entries(this.series).forEach(([key, value]) => {
+            const speedData = data.map(e => {
+                if (value.config.style == 'candlestick') {
                     return {
-                        value: (e[seriesName[key]].close + e[seriesName[key]].open) / 2,
+                        // value: e[key].high,
+                        open: e[seriesName[key]].open,
+                        close: e[seriesName[key]].close,
+                        low: e[seriesName[key]].low,
+                        high: e[seriesName[key]].high,
                         time: parseInt(new Date(e.timestamp).getTime() / 1000),
                     }
-                }).reverse();
-
-                if (!value.series) {
-                    if (value.config.style == 'candlestick') {
-                        value.series = this.obj.addCandlestickSeries({
-                            upColor: value.config.colorUp,
-                            downColor: value.config.colorDown,
-                            borderDownColor: value.config.colorDown,
-                            borderUpColor: value.config.colorUp,
-                            wickDownColor: value.config.colorDOwn,
-                            wickUpColor: value.config.colorUp,
-                            visible: false,
-                        });
-                    }
-                    else {
-                        value.series = this.obj.addAreaSeries({
-                            lineColor: value.config.color,
-                            topColor: `${value.config.color}80`,
-                            bottomColor: `${value.config.color}10`,
-                            lineWidth: 2,
-                            visible: false,
-                        });
-                    }
                 }
-                value.series.setData(speedData);
-            });
-        }
+                return {
+                    value: (e[seriesName[key]].close + e[seriesName[key]].open) / 2,
+                    time: parseInt(new Date(e.timestamp).getTime() / 1000),
+                }
+            }).reverse();
+
+            if (!value.series) {
+                if (value.config.style == 'candlestick') {
+                    value.series = this.obj.addCandlestickSeries({
+                        upColor: value.config.colorUp,
+                        downColor: value.config.colorDown,
+                        borderDownColor: value.config.colorDown,
+                        borderUpColor: value.config.colorUp,
+                        wickDownColor: value.config.colorDOwn,
+                        wickUpColor: value.config.colorUp,
+                        visible: false,
+                    });
+                }
+                else {
+                    value.series = this.obj.addAreaSeries({
+                        lineColor: value.config.color,
+                        topColor: `${value.config.color}80`,
+                        bottomColor: `${value.config.color}10`,
+                        lineWidth: 2,
+                        visible: false,
+                    });
+                }
+            }
+            value.series.setData(speedData);
+        });
     },
 
     setTheme: function (name) {
@@ -374,7 +373,7 @@ export default {
         this.isReady().then(() => {
             this.obj.applyOptions({
                 layout: {
-                    backgroundColor: background,
+                    background: { color: background },
                     textColor: text,
                 },
                 grid: {
@@ -392,9 +391,9 @@ export default {
         this.timeframe = timeframe;
 
         let query = {
-            timeframe: timeframe,
-            page: page,
-            candles: candles,
+            timeframe,
+            page,
+            candles,
             to: this.lastCandle,
             tokenprice: true,
             txfee: true,
@@ -417,7 +416,7 @@ export default {
                 }
             });
 
-            console.log(this.history);
+            // console.log(this.history);
 
             if (this.history.error.status == 401) {
                 return this.getHistory(timeframe, page, candles);

@@ -101,7 +101,7 @@ const gasTimer = {
                     },
                     customClass: gas.gas == this.gasChosen ? 'active' : null,
                 })),
-                {customClass: 'gas-used'},
+                {customClass: 'vertical'},
             );
         }).append(buttonContainer);
 

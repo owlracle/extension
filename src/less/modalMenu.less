@@ -17,6 +17,16 @@
         gap: 10px;
         padding: 10px;
         box-sizing: border-box;
+
+        &.vertical {
+            flex-direction: column;
+            row-gap: 20px;
+        
+            .item {
+                width: 200px;
+                flex-direction: row;
+            }        
+        }
         
         .item {
             box-sizing: border-box;

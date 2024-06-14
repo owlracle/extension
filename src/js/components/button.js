@@ -2,7 +2,7 @@ export default class Button {
 
     domElement = null;
 
-    constructor (text) {
+    constructor (text = '') {
         this.domElement = document.createElement('button');
         this.domElement.innerHTML = text;
     }
@@ -14,6 +14,11 @@ export default class Button {
 
     append (container) {
         container.appendChild(this.domElement);
+        return this;
+    }
+
+    setText (text) {
+        this.domElement.innerHTML = text;
         return this;
     }
 }

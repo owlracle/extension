@@ -34,12 +34,22 @@ The extension has three menu buttons located at the bottom.
 blocks = 200
 percentile = 0.3
 accept = 35,60,90,100
-version = 2
+gasused = 184523
 ```
 
 You can change the desired network on the button in the header, just like on our website.
 
-<p align="center"><img src="https://user-images.githubusercontent.com/19828711/171278345-f3832e49-28b3-4f37-beb7-8d9bb61a81a3.png"></p>
+<p align="center"><img src="https://github.com/owlracle/extension/assets/19828711/9493eefd-cbe1-4518-81bd-b4f27af60cc3"></p>
+
+You can also change the gas used value clicking on the **Customize Fee** button. This will open a new window where you can choose from a list of predefined common operations.
+
+<p align="center"><img src="https://github.com/owlracle/extension/assets/19828711/a28cef6e-3f1f-4b3d-810f-71be99b0d4df"></p>
+
+Or if you want to change the predefined speeds (the accept values), you can click on the **Customize Speeds** button. This will allow you to change the acceptance values every one of the four speeds.
+
+<p align="center"><img src="https://github.com/owlracle/extension/assets/19828711/eac62883-7ced-4c5c-b506-f913c6a93694"></p>
+
+
 
 * The second tab is for gas price history. Just like on our website, you can change the timeframe (_10m_, _30m_, _1h_, _2h_, _4h_, _1d_), the chart style (_area_ or _candlesticks_) and the information you want to track (_gas price_, _token price_, _estimated gas fee_).
 

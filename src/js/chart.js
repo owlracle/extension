@@ -406,10 +406,10 @@ export default {
 
         this.history = await new Request().get(`${this.network}/history`, query);
         // console.log(this.history)
-        if (this.history.error) {
+        if (this.history.error && this.history.error.status == 403) {
             new ModalWindow({
-                title: this.history.error,
-                message: this.history.message,
+                title: this.history.error.type,
+                message: this.history.error.message,
                 buttons: {
                     'LOGIN': () => menu.click('key'),
                     'CLOSE': () => {}

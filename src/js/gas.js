@@ -135,11 +135,11 @@ const gasTimer = {
         const data = await new Request().get(`${ (await new Network().get()).symbol }/gas`, query);
         // console.log(data)
 
-        if (data.error && data.status == 403) {
+        if (data.error && data.error.status == 403) {
             console.log(data);
             new ModalWindow({
-                title: data.error,
-                message: data.message,
+                title: data.error.type,
+                message: data.error.message,
                 buttons: {
                     'LOGIN': () => menu.click('key'),
                     'CLOSE': () => {}
